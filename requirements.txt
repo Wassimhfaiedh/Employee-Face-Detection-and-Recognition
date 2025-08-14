@@ -1,0 +1,7 @@
+opencv-python
+numpy==1.23.5
+ultralytics
+keras-facenet
+scipy
+tensorflow
+./dlib-19.22.99-cp310-cp310-win_amd64.whl
