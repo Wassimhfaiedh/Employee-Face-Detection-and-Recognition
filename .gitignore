@@ -1,2 +1,15 @@
-face_embeddings.json
-models/yolov8m_200e.pt
+# Virtual environment folders
+venv/
+env/
+.venv/
+
+# VSCode settings
+.vscode/
+
+# Dataset and videos   
+data/        
+
+# Model and embeddings
+models/yolov8m_200e.pt  
+face_embeddings.json     
+
