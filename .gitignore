@@ -1,2 +1,25 @@
-face_embeddings.json
-models/yolov8m_200e.pt
+# Python cache files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environment folders
+venv/
+env/
+.venv/
+
+# VSCode settings
+.vscode/
+
+# Dataset and videos
+faces/      
+data/        
+
+# Model and embeddings
+models/yolov8m_200e.pt  
+face_embeddings.json     
+
+# System files
+.DS_Store
+Thumbs.db
