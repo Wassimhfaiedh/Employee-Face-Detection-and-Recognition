@@ -1,9 +1,3 @@
-# Python cache files
-__pycache__/
-*.pyc
-*.pyo
-*.pyd
-
 # Virtual environment folders
 venv/
 env/
@@ -19,6 +13,3 @@ data/
 models/yolov8m_200e.pt  
 face_embeddings.json     
 
-# System files
-.DS_Store
-Thumbs.db
