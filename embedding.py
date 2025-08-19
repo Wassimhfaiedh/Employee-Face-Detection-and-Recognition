@@ -5,52 +5,82 @@ from keras_facenet import FaceNet
 import json
 
 # =========================
-# 1️⃣ Initialisation du modèle
+# 1️⃣ Initialize the model
 # =========================
-embedder = FaceNet()  # Crée l'embedder FaceNet pour extraire les vecteurs faciaux
+embedder = FaceNet()  
 
 # =========================
-# 2️⃣ Préparation du dataset
+# 2️⃣ Prepare the dataset
 # =========================
-dataset_path = "faces"      # Chemin vers le dossier contenant les images
-embeddings_dict = {}        # Dictionnaire pour stocker les embeddings de chaque personne
+dataset_path = "faces"
+json_path = "face_embeddings.json"
+
+# Load existing embeddings if the file exists
+if os.path.exists(json_path):
+    with open(json_path, "r") as f:
+        embeddings_dict = json.load(f)
+else:
+    embeddings_dict = {}
 
 # =========================
-# 3️⃣ Boucle sur chaque personne
+# 2️⃣1️⃣ Delete people not in dataset anymore
+# =========================
+if os.path.exists(dataset_path):
+    existing_people = set(os.listdir(dataset_path))
+    to_delete = [name for name in embeddings_dict if name not in existing_people]
+    for name in to_delete:
+        del embeddings_dict[name]
+        print(f"🗑️  Removed {name} from embeddings because folder is missing.")
+else:
+    print(f"Error: Dataset path '{dataset_path}' does not exist.")
+    exit(1)
+
+# =========================
+# 3️⃣ Loop through each person to add new embeddings
 # =========================
 for person_name in os.listdir(dataset_path):
     person_folder = os.path.join(dataset_path, person_name)
     
     if not os.path.isdir(person_folder):
-        continue  # Ignorer les fichiers qui ne sont pas des dossiers
+        continue  
 
-    embeddings_list = []  # Liste pour stocker les embeddings de cette personne
+    # Skip if already in JSON (we already have embeddings)
+    if person_name in embeddings_dict:
+        print(f"⚠️  {person_name} already exists in the database.")
+        continue
 
-    # =========================
-    # 3a️⃣ Boucle sur chaque image
-    # =========================
+    embeddings_list = []
+
+    # Loop through each image
     for img_name in os.listdir(person_folder):
         img_path = os.path.join(person_folder, img_name)
-        img = cv2.imread(img_path)                  # Lire l'image
-        img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)  # Convertir BGR -> RGB
+        
+        # Check if file is an image
+        if not img_name.lower().endswith(('.png', '.jpg', '.jpeg')):
+            continue
+            
+        img = cv2.imread(img_path)
+        if img is None:
+            print(f"❌ Failed to read image: {img_path}")
+            continue
+                  
+        img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)  
 
         try:
-            # =========================
-            # 3b️⃣ Extraction de l'embedding
-            # =========================
             embedding = embedder.embeddings([img_rgb])[0]
             embeddings_list.append(embedding.tolist())
+            print(f"✅ Processed {img_name} for {person_name}")
         except Exception as e:
-            print(f"❌ Échec pour {img_path}: {e}")
+            print(f"❌ Failed to process {img_path}: {e}")
 
-    # Ajouter les embeddings extraits au dictionnaire principal
     if embeddings_list:
         embeddings_dict[person_name] = embeddings_list
+        print(f"✅ Added {len(embeddings_list)} embeddings for {person_name}")
 
 # =========================
-# 4️⃣ Sauvegarde des embeddings
+# 4️⃣ Save updated embeddings
 # =========================
-with open("face_embeddings.json", "w") as f:
-    json.dump(embeddings_dict, f)
+with open(json_path, "w") as f:
+    json.dump(embeddings_dict, f, indent=4)
 
-print("✅ Tous les embeddings faciaux ont été sauvegardés dans face_embeddings.json")
+print(f"✅ Embeddings JSON has been updated with {len(embeddings_dict)} people.")
