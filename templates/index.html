@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ox4Labs - Employee Recognition System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="logo-container">
+                <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTAiIGhlaWdodD0iNTAiIHZpZXdCb3g9IjAgMCA1MCA1MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjUwIiBoZWlnaHQ9IjUwIiByeD0iMjUiIGZpbGw9IiMwMTU3OUIiLz4KPHJlY3QgeD0iMSIgeT0iMSIgd2lkdGg9IjQ4IiBoZWlnaHQ9IjQ4IiByeD0iMjQiIHN0cm9rZT0iIzRGQzNGNyIgc3Ryb2tlLXdpZHRoPSIyIi8+CjxjaXJjbGUgY3g9IjI1IiBjeT0iMjUiIHI9IjEwIiBzdHJva2U9IiNGRkZGRkYiIHN0cm9rZS13aWR0aD0iMiIvPgo8Y2lyY2xlIGN4PSIyNSIgY3k9IjIwIiByPSIzIiBmaWxsPSIjRkZGRkZGIi8+CjxwYXRoIGQ9Ik0xNSAzNUMxNyAzOCAzMyAzOCAzNSAzNSIgc3Ryb2tlPSIjRkZGRkZGIiBzdHJva2Utd2lkdGg9IjIiLz4KPC9zdmc+" alt="Ox4Labs Logo" class="logo">
+                <div class="brand">
+                    <h1 class="app-name">Ox4Labs</h1>
+                    <p class="app-tagline">Employee Face Recognition System</p>
+                </div>
+            </div>
+            <div class="system-status">
+                <div class="status-indicator">
+                    <div class="status-dot recording"></div>
+                    <span>Recording</span>
+                </div>
+                <div class="status-indicator">
+                    <div class="status-dot"></div>
+                    <span>Online</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="main-content">
+            <div class="video-panel">
+                <div class="panel-header">
+                    <h2 class="panel-title"><i class="fas fa-camera"></i> Face Recognition Feed</h2>
+                </div>
+                <div class="canvas-container" id="canvas-container">
+                    <div id="canvas-wrapper-1" class="canvas-wrapper">
+                        <canvas id="canvas1" width="1920" height="1080"></canvas>
+                        <div id="canvas-overlay-1" class="canvas-overlay">CCTV - Camera A</div>
+                    </div>
+                    <div id="canvas-wrapper-2" class="canvas-wrapper" style="display: none;">
+                        <canvas id="canvas2" width="1920" height="1080"></canvas>
+                        <div id="canvas-overlay-2" class="canvas-overlay">CCTV - Camera B</div>
+                    </div>
+                </div>
+                <div class="camera-grid">
+                    <div class="camera-tile" data-camera-id="1" onclick="selectCamera('1')">
+                        <div class="camera-meta">CCTV - Camera A</div>
+                        <div class="camera-status"></div>
+                        <div class="camera-placeholder">
+                            <i class="fas fa-video camera-icon"></i>
+                            <div class="camera-label">CCTV 1</div>
+                        </div>
+                    </div>
+                    <div class="camera-tile" data-camera-id="2" onclick="selectCamera('2')">
+                        <div class="camera-meta">CCTV - Camera B</div>
+                        <div class="camera-status"></div>
+                        <div class="camera-placeholder">
+                            <i class="fas fa-video camera-icon"></i>
+                            <div class="camera-label">CCTV 2</div>
+                        </div>
+                    </div>
+                    <div class="camera-tile" data-camera-id="both" onclick="selectCamera('both')">
+                        <div class="camera-meta">CCTV - Both Cameras</div>
+                        <div class="camera-status"></div>
+                        <div class="camera-placeholder">
+                            <i class="fas fa-video camera-icon"></i>
+                            <div class="camera-label">Both</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="controls">
+                    <button onclick="togglePauseResume()" class="btn btn-pause" disabled id="pause-resume-btn">
+                        <i class="fas fa-pause"></i> Pause Detection
+                    </button>
+                </div>
+                <p id="status1" class="status-message">Status: Select a CCTV feed to start detection</p>
+                <p id="status2" class="status-message" style="display: none;">Status: Select a CCTV feed to start detection</p>
+            </div>
+
+            <div class="dashboard-panel">
+                <div class="dashboard-header">
+                    <h2 class="dashboard-title"><i class="fas fa-users"></i> Employees Recognition</h2>
+                </div>
+                <div class="stats-container">
+                    <h3 class="detections-title"><i class="fas fa-user-check"></i> Recognized Employees</h3>
+                    <div class="detections-list" id="employee-detections-list">
+                        <div class="detection-placeholder">No recognized employees yet</div>
+                    </div>
+                    <h3 class="detections-title visitor"><i class="fas fa-user-slash"></i> Detected Visitors</h3>
+                    <div class="detections-list" id="visitor-detections-list">
+                        <div class="detection-placeholder">No detected visitors yet</div>
+                    </div>
+                </div>
+                <div class="detections-container">
+                    <h3 class="detections-title"><i class="fas fa-chart-bar"></i> Detection Analytics</h3>
+                    <div class="analytics-list" id="analytics-list">
+                        <div class="analytics-item known">
+                            <div class="analytics-label">Known Employees</div>
+                            <div class="analytics-value" id="known-percent">0%</div>
+                        </div>
+                        <div class="analytics-item visitor">
+                            <div class="analytics-label">Visitors</div>
+                            <div class="analytics-value" id="visitor-percent">0%</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal" id="person-modal">
+            <div class="modal-content">
+                <span class="modal-close" onclick="closeModal()">&times;</span>
+                <div class="modal-header">
+                    <h2 class="modal-title">Person Details</h2>
+                </div>
+                <div class="modal-body">
+                    <div class="modal-canvas-container">
+                        <canvas id="modal-canvas" width="1920" height="1080"></canvas>
+                    </div>
+                    <div class="modal-person-card">
+                        <img id="modal-person-image" class="modal-person-image" src="" alt="Person Image">
+                        <div class="modal-person-info"><span>Name:</span> <span id="modal-person-name"></span></div>
+                        <div class="modal-person-info"><span>ID:</span> <span id="modal-person-id"></span></div>
+                        <div class="modal-person-info"><span>Timestamp:</span> <span id="modal-person-timestamp"></span></div>
+                        <div class="modal-person-info"><span>Camera:</span> <span id="modal-person-camera"></span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer class="footer">
+            <div class="footer-links">
+                <a href="#" class="footer-link">Privacy Policy</a>
+                <a href="#" class="footer-link">Terms of Service</a>
+                <a href="#" class="footer-link">Documentation</a>
+                <a href="#" class="footer-link">Support</a>
+            </div>
+            <p class="footer-copyright">© 2025 Ox4Labs. All rights reserved.</p>
+            <p class="developer-info">Designed & Developed by Wassim Hfaiedh</p>
+        </footer>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.1/socket.io.js"></script>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
