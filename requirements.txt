@@ -1,7 +1,8 @@
 opencv-python
-numpy==1.23.5
-ultralytics
-keras-facenet
+numpy
 scipy
-tensorflow
+insightface
+flask
+flask-socketio
+
 ./dlib-19.22.99-cp310-cp310-win_amd64.whl
