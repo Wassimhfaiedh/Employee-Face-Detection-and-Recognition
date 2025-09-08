@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OX4labs License Plate Recognition</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #1d4ed8;
+            --secondary: #1e40af;
+            --accent: #93c5fd;
+            --success: #059669;
+            --danger: #dc2626;
+            --dark-bg: #0a0a0a;
+            --dark-card: #18181b;
+            --dark-border: #2d2d2d;
+            --text-primary: #f8fafc;
+            --text-secondary: #d1d5db;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--dark-bg);
+            color: var(--text-primary);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+        }
+        
+        .glass-card {
+            background: rgba(24, 24, 27, 0.9);
+            backdrop-filter: blur(18px);
+            border: 1px solid var(--dark-border);
+            border-radius: 14px;
+            box-shadow: 0 10px 35px rgba(0, 0, 0, 0.45);
+        }
+        
+        .dashboard-card {
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            border-radius: 10px;
+            background: var(--dark-card);
+            padding: 0.75rem;
+        }
+        
+        .dashboard-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+        }
+        
+        .dashboard-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+        }
+        
+        .in-card::before {
+            background: linear-gradient(90deg, var(--success), #34d399);
+        }
+        
+        .out-card::before {
+            background: linear-gradient(90deg, var(--danger), #f87171);
+        }
+        
+        .total-card::before {
+            background: linear-gradient(90deg, #7c3aed, #c084fc);
+        }
+        
+        .dashboard-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            line-height: 1;
+            color: var(--text-primary);
+        }
+        
+        .in-card .dashboard-value {
+            color: var(--success);
+        }
+        
+        .out-card .dashboard-value {
+            color: var(--danger);
+        }
+        
+        .total-card .dashboard-value {
+            color: #7c3aed;
+        }
+        
+        .vehicle-card {
+            transition: all 0.3s ease;
+            border-left: 5px solid var(--primary);
+            border-radius: 12px;
+            background: var(--dark-card);
+        }
+        
+        .vehicle-card.in {
+            border-left-color: var(--success);
+        }
+        
+        .vehicle-card.out {
+            border-left-color: var(--danger);
+        }
+        
+        .vehicle-card.detected {
+            border-left-color: var(--accent);
+        }
+        
+        .vehicle-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.35);
+        }
+        
+        .vehicle-card.active {
+            border-left-width: 6px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.45);
+            transform: scale(1.015);
+        }
+        
+        .video-container {
+            position: relative;
+            border-radius: 14px;
+            overflow: hidden;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.45);
+            background: #000;
+            width: 100%;
+            aspect-ratio: 16/9;
+        }
+        
+        .control-btn {
+            transition: all 0.3s ease;
+            font-weight: 600;
+            border-radius: 8px;
+            padding: 0.5rem 1rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
+            font-size: 0.85rem;
+        }
+        
+        .control-btn i {
+            font-size: 0.9rem;
+        }
+        
+        .control-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.35);
+        }
+        
+        .section-title {
+            position: relative;
+            padding-bottom: 0.75rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            letter-spacing: -0.025em;
+            font-size: 1.5rem;
+        }
+        
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 50px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            border-radius: 2px;
+        }
+        
+        .video-thumbnail {
+            transition: all 0.3s ease;
+            border-radius: 14px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
+        }
+        
+        .video-thumbnail:hover {
+            transform: scale(1.025);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.35);
+        }
+        
+        .stats-bar {
+            display: flex;
+            align-items: center;
+            background: rgba(24, 24, 27, 0.9);
+            border-radius: 12px;
+            padding: 0.75rem 1rem;
+            margin-top: 1rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--dark-border);
+        }
+        
+        .stats-item {
+            display: flex;
+            align-items: center;
+            margin-right: 1.5rem;
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+        
+        .stats-item i {
+            margin-right: 0.5rem;
+            color: var(--primary);
+        }
+        
+        #timeline {
+            height: 6px;
+            background: #2d2d2d;
+            border-radius: 3px;
+            margin-top: 0.5rem;
+            cursor: pointer;
+            position: relative;
+        }
+        
+        #progress {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            border-radius: 3px;
+            transition: width 0.3s ease;
+        }
+        
+        #thumb {
+            width: 16px;
+            height: 16px;
+            background: white;
+            border: 2px solid var(--primary);
+            border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            left: 0%;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+        }
+        
+        .nav-tab {
+            padding: 0.75rem 1.25rem;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+        
+        .nav-tab.active {
+            background: var(--dark-card);
+            color: var(--primary);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+        }
+        
+        .nav-tab:hover:not(.active) {
+            background: rgba(24, 24, 27, 0.65);
+            color: var(--text-primary);
+        }
+
+        .status-bar {
+            transition: all 0.3s ease;
+            background: rgba(24, 24, 27, 0.9);
+            border: 1px solid var(--dark-border);
+        }
+        
+        .plate-img {
+            height: 60px;
+            width: auto;
+            max-width: 150px;
+            object-fit: contain;
+            background: #18181b;
+            border-radius: 8px;
+            padding: 6px;
+            border: 1px solid var(--dark-border);
+        }
+
+        .video-error {
+            color: var(--danger);
+            font-size: 0.9rem;
+            text-align: center;
+            padding: 1rem;
+        }
+        
+        .download-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 6px 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            font-size: 0.85rem;
+        }
+        
+        .download-btn:hover {
+            background: var(--secondary);
+        }
+        
+        .download-btn:disabled {
+            background: var(--dark-border);
+            cursor: not-allowed;
+        }
+        
+        .ox4-brand {
+            background: linear-gradient(135deg, #1d4ed8, #1e40af);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 800;
+        }
+        
+        .ox4-badge {
+            background: linear-gradient(135deg, #1d4ed8, #1e40af);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .camera-badge {
+            background: linear-gradient(135deg, #1d4ed8, #1e40af);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .zone-container {
+            display: flex;
+            gap: 10px;
+            justify-content: space-between;
+            width: 100%;
+        }
+
+        .zone-canvas {
+            flex: 1;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: border-color 0.3s ease;
+            width: 100%;
+            height: 100%;
+        }
+
+        .zone-canvas.active {
+            border-color: var(--primary);
+        }
+
+        .button-section {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 1rem;
+            margin-bottom: 1rem;
+            padding: 0.75rem;
+            background: rgba(24, 24, 27, 0.9);
+            border: 1px solid var(--dark-border);
+            border-radius: 8px;
+        }
+
+        .video-container.single {
+            flex: 1;
+            max-width: 100%;
+        }
+
+        .video-container.split {
+            flex: 1;
+            max-width: 49.5%;
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <div class="container max-w-7xl mx-auto p-5">
+        <!-- Header -->
+        <header class="glass-card rounded-xl p-6 mb-8 flex justify-between items-center">
+            <div>
+                <h1 class="text-3xl font-bold text-slate-200"><span class="ox4-brand">OX4labs</span> License Plate Recognition</h1>
+                <p class="text-slate-400 text-base">Advanced AI-Powered Traffic Monitoring Solution</p>
+            </div>
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 rounded-full bg-blue-900 flex items-center justify-center">
+                    <i class="fas fa-user text-blue-400 text-xl"></i>
+                </div>
+            </div>
+        </header>
+
+        <div class="flex flex-col lg:flex-row gap-8">
+            <!-- Main Content -->
+            <div class="flex-1">
+                <!-- Video Section -->
+                <div class="glass-card rounded-xl p-6 mb-8">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="section-title text-2xl">Live Surveillance Feed</h2>
+                        <div class="flex items-center space-x-2">
+                            <span class="bg-red-500 w-3 h-3 rounded-full animate-pulse"></span>
+                            <span class="text-base font-medium text-slate-300">LIVE</span>
+                        </div>
+                    </div>
+
+                    <div id="zoneContainer" class="zone-container mb-6">
+                        <div id="canvasContainer1" class="video-container hidden" style="aspect-ratio: 16/9;">
+                            <canvas id="canvas1" class="zone-canvas"></canvas>
+                        </div>
+                        <div id="canvasContainer2" class="video-container hidden" style="aspect-ratio: 16/9;">
+                            <canvas id="canvas2" class="zone-canvas"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="stats-bar">
+                        <!-- Empty stats bar -->
+                    </div>
+                    
+                    <div id="timeline" class="mt-4">
+                        <div id="progress"></div>
+                        <div id="thumb"></div>
+                    </div>
+                    
+                    <div class="button-section">
+                        <button id="showStreamA" class="control-btn bg-blue-600 text-white">
+                            <i class="fas fa-video mr-1"></i> Stream A
+                        </button>
+                        <button id="showStreamB" class="control-btn bg-blue-600 text-white">
+                            <i class="fas fa-video mr-1"></i> Stream B
+                        </button>
+                        <button id="showBothStreams" class="control-btn bg-blue-600 text-white">
+                            <i class="fas fa-video mr-1"></i> Both Streams
+                        </button>
+                        <button id="confirmBtn" class="control-btn bg-blue-600 text-white disabled:bg-slate-700 disabled:text-slate-500 disabled:cursor-not-allowed">
+                            <i class="fas fa-play-circle mr-1"></i> Start
+                        </button>
+                        <button id="deleteBtn" class="control-btn bg-slate-800 text-slate-300 disabled:bg-slate-800 disabled:text-slate-500" disabled>
+                            <i class="fas fa-trash-alt mr-1"></i> Reset
+                        </button>
+                        <button id="stopBtn" class="control-btn bg-red-700 text-white">
+                            <i class="fas fa-stop-circle mr-1"></i> Stop
+                        </button>
+                    </div>
+                    
+                    <div id="status1" class="status-bar mt-4 text-center p-4 bg-blue-900 text-blue-200 rounded-xl">
+                        <i class="fas fa-info-circle mr-2"></i> Status: Cam A - Ready to start monitoring
+                    </div>
+                    <div id="status2" class="status-bar mt-4 text-center p-4 bg-blue-900 text-blue-200 rounded-xl hidden">
+                        <i class="fas fa-info-circle mr-2"></i> Status: Cam B - Ready to start monitoring
+                    </div>
+
+                    <!-- Traffic Analytics -->
+                    <div class="glass-card rounded-xl p-4 mt-6">
+                        <h2 class="section-title text-xl mb-4">Traffic Analytics</h2>
+                        <div class="grid grid-cols-3 gap-3">
+                            <div class="dashboard-card in-card glass-card text-center">
+                                <i class="fas fa-sign-in-alt text-lg text-green-500 mb-1"></i>
+                                <div class="dashboard-value" id="total-in">0</div>
+                                <div class="text-slate-400 text-xs mt-1">Total In</div>
+                            </div>
+                            
+                            <div class="dashboard-card out-card glass-card text-center">
+                                <i class="fas fa-sign-out-alt text-lg text-red-500 mb-1"></i>
+                                <div class="dashboard-value" id="total-out">0</div>
+                                <div class="text-slate-400 text-xs mt-1">Total Out</div>
+                            </div>
+                            
+                            <div class="dashboard-card total-card glass-card text-center">
+                                <i class="fas fa-car text-lg text-purple-500 mb-1"></i>
+                                <div class="dashboard-value" id="total-count">0</div>
+                                <div class="text-slate-400 text-xs mt-1">Total Vehicles</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Vehicle Records -->
+                <div class="glass-card rounded-xl p-6">
+                    <h2 class="section-title text-2xl mb-6">Recent Vehicle Detections</h2>
+                    
+                    <div class="flex space-x-4 mb-6 border-b border-slate-700">
+                        <div class="nav-tab active" data-filter="all">All Vehicles</div>
+                        <div class="nav-tab" data-filter="in">In</div>
+                        <div class="nav-tab" data-filter="out">Out</div>
+                        <div class="nav-tab" data-filter="detected">Detected</div>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="vehicle-list">
+                        <!-- Vehicle cards will be added here dynamically -->
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Sidebar -->
+            <div class="w-full lg:w-96">
+                <!-- Vehicle Details Panel -->
+                <div class="glass-card rounded-xl p-6">
+                    <h2 class="section-title text-2xl mb-6">Vehicle Details</h2>
+                    
+                    <div class="text-center py-10 text-slate-500" id="no-selection">
+                        <i class="fas fa-car text-4xl mb-3"></i>
+                        <p class="text-base">Select a vehicle to view details</p>
+                    </div>
+                    
+                    <div id="vehicle-details" class="hidden">
+                        <div class="text-center mb-6">
+                            <div class="w-24 h-24 rounded-full overflow-hidden mx-auto border-4 border-slate-800 shadow-lg">
+                                <img id="detail-car-img" class="w-full h-full object-cover">
+                            </div>
+                            <h3 id="detail-matricule" class="text-xl font-bold mt-4 text-slate-200"></h3>
+                            <div id="detail-mode" class="inline-block text-sm py-1 px-3 rounded-full mt-2"></div>
+                            <div class="mt-4">
+                                <img id="detail-plate-img" class="plate-img mx-auto">
+                            </div>
+                        </div>
+                        
+                        <div class="space-y-3">
+                            <div class="flex justify-between">
+                                <span class="text-slate-400 text-sm">Timestamp</span>
+                                <span id="detail-time" class="font-medium text-slate-200 text-sm"></span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-slate-400 text-sm">Direction</span>
+                                <span id="detail-direction" class="font-medium text-slate-200 text-sm"></span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-slate-400 text-sm">Camera</span>
+                                <span id="detail-camera" class="font-medium text-slate-200 text-sm"></span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-slate-400 text-sm">Video Duration</span>
+                                <span id="detail-video-duration" class="font-medium text-slate-200 text-sm">4 seconds</span>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-6">
+                            <h4 class="font-medium mb-3 text-slate-200 text-base">Recorded Video</h4>
+                            <div class="video-thumbnail relative bg-slate-900 rounded-xl overflow-hidden" style="aspect-ratio: 16/9;">
+                                <img id="detail-video-thumb" class="w-full h-full object-cover opacity-70">
+                                <div class="absolute inset-0 flex items-center justify-center">
+                                    <button class="download-btn" id="download-link">
+                                        <i class="fas fa-download"></i> Download Recording
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="flex justify-between items-center mt-3">
+                                <span class="text-sm text-slate-400" id="detail-video-info">4-second recording</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.1/socket.io.js"></script>
+    <script>
+        const socket = io();
+        const frameDimensions = {'1': {width: 960, height: 540}, '2': {width: 960, height: 540}};
+        let pointsAdded = {'1': 0, '2': 0};
+        let currentVideoUrl = '';
+        let currentEvent = null;
+        let currentProcessorId = '1';
+        let displayMode = 'both'; // 'streamA', 'streamB', or 'both'
+
+        function updateStatus(processorId, message) {
+            const statusElement = document.getElementById(`status${processorId}`);
+            statusElement.innerHTML = `<i class="fas fa-info-circle mr-2"></i> Status: ${message}`;
+            statusElement.classList.remove('hidden');
+            const otherProcessorId = processorId === '1' ? '2' : '1';
+            document.getElementById(`status${otherProcessorId}`).classList.add('hidden');
+        }
+
+        function updateDashboard() {
+            let total_in = 0;
+            let total_out = 0;
+            Object.keys(processorsData).forEach(pid => {
+                total_in += processorsData[pid].in_count;
+                total_out += processorsData[pid].out_count;
+            });
+            document.getElementById('total-in').textContent = total_in;
+            document.getElementById('total-out').textContent = total_out;
+            document.getElementById('total-count').textContent = total_in + total_out;
+        }
+
+        const processorsData = {'1': {in_count: 0, out_count: 0, vehicle_events: []}, '2': {in_count: 0, out_count: 0, vehicle_events: []}};
+
+        function renderVehicleList() {
+            const vehicleList = document.getElementById('vehicle-list');
+            vehicleList.innerHTML = '';
+            
+            const activeTab = document.querySelector('.nav-tab.active')?.getAttribute('data-filter') || 'all';
+            let allEvents = [];
+            Object.keys(processorsData).forEach(pid => {
+                processorsData[pid].vehicle_events.forEach(event => {
+                    allEvents.push({...event, processor_id: pid});
+                });
+            });
+
+            const filteredEvents = allEvents.filter(event => {
+                if (activeTab === 'all') return true;
+                return event.mode.toLowerCase() === activeTab;
+            });
+
+            filteredEvents.sort((a, b) => new Date(b.cross_time) - new Date(a.cross_time));
+
+            filteredEvents.forEach((event, index) => {
+                if (event.car_img && event.mode && event.cross_time) {
+                    const card = document.createElement('div');
+                    card.className = `vehicle-card ${event.mode.toLowerCase()} glass-card p-4 flex cursor-pointer`;
+                    card.dataset.eventId = event.id;
+                    card.dataset.processorId = event.processor_id;
+                    let modeColor = event.mode === 'In' ? 'bg-green-900 text-green-300' : event.mode === 'Out' ? 'bg-red-900 text-red-300' : 'bg-blue-900 text-blue-300';
+                    const cameraLabel = event.camera;
+                    card.innerHTML = `
+                        <div class="w-20 h-20 rounded-lg overflow-hidden mr-4">
+                            <img src="data:image/jpeg;base64,${event.car_img}" class="w-full h-full object-cover">
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex justify-between items-start">
+                                <h3 class="font-bold text-slate-200 text-lg">${event.matricule}</h3>
+                                <span class="text-sm py-1 px-2 ${modeColor} rounded-full">${event.mode}</span>
+                            </div>
+                            <p class="text-base text-slate-400 mb-1">${event.cross_time}</p>
+                            <div class="flex items-center text-sm text-slate-500">
+                                <i class="fas fa-video mr-1"></i>
+                                <span>${cameraLabel}</span>
+                            </div>
+                            <div class="mt-2">
+                                <img src="data:image/jpeg;base64,${event.plate_img}" class="plate-img">
+                            </div>
+                        </div>
+                    `;
+                    card.addEventListener('click', () => {
+                        document.querySelectorAll('.vehicle-card').forEach(c => c.classList.remove('active'));
+                        card.classList.add('active');
+                        showVehicleDetails(event, event.id, event.processor_id);
+                    });
+                    vehicleList.appendChild(card);
+                }
+            });
+        }
+
+        function setupNavTabs() {
+            const navTabs = document.querySelectorAll('.nav-tab');
+            navTabs.forEach(tab => {
+                const newTab = tab.cloneNode(true);
+                tab.parentNode.replaceChild(newTab, tab);
+            });
+
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    renderVehicleList();
+                });
+            });
+        }
+
+        function showVehicleDetails(event, id, processorId) {
+            document.getElementById('no-selection').classList.add('hidden');
+            document.getElementById('vehicle-details').classList.remove('hidden');
+            
+            document.getElementById('detail-matricule').textContent = event.matricule;
+            document.getElementById('detail-time').textContent = event.cross_time;
+            document.getElementById('detail-direction').textContent = event.mode;
+            document.getElementById('detail-camera').textContent = event.camera;
+            document.getElementById('detail-video-duration').textContent = event.video_duration || '4 seconds';
+            document.getElementById('detail-video-info').textContent = `${event.video_duration || '4-second'} recording`;
+            
+            const modeElement = document.getElementById('detail-mode');
+            modeElement.textContent = event.mode;
+            let modeColor = event.mode === 'In' ? 'bg-green-900 text-green-300' : event.mode === 'Out' ? 'bg-red-900 text-red-300' : 'bg-blue-900 text-blue-300';
+            modeElement.className = `inline-block text-sm py-1 px-3 rounded-full mt-2 ${modeColor}`;
+            
+            document.getElementById('detail-car-img').src = event.car_img ? `data:image/jpeg;base64,${event.car_img}` : '';
+            document.getElementById('detail-plate-img').src = event.plate_img ? `data:image/jpeg;base64,${event.plate_img}` : '';
+            document.getElementById('detail-video-thumb').src = event.car_img ? `data:image/jpeg;base64,${event.car_img}` : '';
+            
+            currentEvent = event;
+            currentVideoUrl = event.video_path ? `/videos/${event.video_path}?t=${Date.now()}` : '';
+
+            document.getElementById('download-link').onclick = () => {
+                if (!currentVideoUrl) {
+                    alert('No video recording available for this event');
+                    return;
+                }
+                
+                const a = document.createElement('a');
+                a.href = currentVideoUrl;
+                a.download = `${event.matricule}_recording.mp4`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                console.log(`Initiating download: ${currentVideoUrl}`);
+            };
+        }
+
+        function switchZone(processorId) {
+            currentProcessorId = processorId;
+            document.querySelectorAll('.zone-canvas').forEach(canvas => {
+                canvas.classList.remove('active');
+            });
+            document.getElementById(`canvas${processorId}`).classList.add('active');
+            updateStatus(processorId, `Cam ${processorId === '1' ? 'A' : 'B'} - Ready to start monitoring`);
+            document.getElementById('confirmBtn').disabled = false;
+            document.getElementById('deleteBtn').disabled = pointsAdded[processorId] === 0;
+        }
+
+        function toggleDisplayMode(mode) {
+            displayMode = mode;
+            const container1 = document.getElementById('canvasContainer1');
+            const container2 = document.getElementById('canvasContainer2');
+            const zoneContainer = document.getElementById('zoneContainer');
+
+            if (mode === 'streamA') {
+                container1.classList.remove('hidden', 'split');
+                container1.classList.add('single');
+                container2.classList.add('hidden');
+                container2.classList.remove('split');
+                zoneContainer.style.flexDirection = 'row';
+                switchZone('1');
+            } else if (mode === 'streamB') {
+                container1.classList.add('hidden');
+                container1.classList.remove('split');
+                container2.classList.remove('hidden', 'split');
+                container2.classList.add('single');
+                zoneContainer.style.flexDirection = 'row';
+                switchZone('2');
+            } else {
+                container1.classList.remove('hidden');
+                container1.classList.add('split');
+                container2.classList.remove('hidden');
+                container2.classList.add('split');
+                zoneContainer.style.flexDirection = 'row';
+                switchZone('1');
+            }
+        }
+
+        document.getElementById('canvas1').onclick = (event) => {
+            switchZone('1');
+            if (pointsAdded['1'] < 2 && (displayMode === 'streamA' || displayMode === 'both')) {
+                const rect = event.target.getBoundingClientRect();
+                const x = (event.clientX - rect.left) * (frameDimensions['1'].width / rect.width);
+                const y = (event.clientY - rect.top) * (frameDimensions['1'].height / rect.height);
+                socket.emit('add_line_point', {processor_id: '1', x, y});
+                pointsAdded['1']++;
+                if (pointsAdded['1'] === 1) {
+                    document.getElementById('deleteBtn').disabled = false;
+                }
+            }
+        };
+
+        document.getElementById('canvas2').onclick = (event) => {
+            switchZone('2');
+            if (pointsAdded['2'] < 2 && (displayMode === 'streamB' || displayMode === 'both')) {
+                const rect = event.target.getBoundingClientRect();
+                const x = (event.clientX - rect.left) * (frameDimensions['2'].width / rect.width);
+                const y = (event.clientY - rect.top) * (frameDimensions['2'].height / rect.height);
+                socket.emit('add_line_point', {processor_id: '2', x, y});
+                pointsAdded['2']++;
+                if (pointsAdded['2'] === 1) {
+                    document.getElementById('deleteBtn').disabled = false;
+                }
+            }
+        };
+
+        document.getElementById('confirmBtn').onclick = () => {
+            if (pointsAdded[currentProcessorId] === 1) {
+                alert('Please add the second point or reset the line to start without.');
+                return;
+            }
+            socket.emit('complete_line', {processor_id: currentProcessorId});
+        };
+
+        document.getElementById('deleteBtn').onclick = () => {
+            socket.emit('delete_line', {processor_id: currentProcessorId});
+            pointsAdded[currentProcessorId] = 0;
+            document.getElementById('deleteBtn').disabled = true;
+        };
+
+        document.getElementById('stopBtn').onclick = () => {
+            socket.emit('stop', {processor_id: currentProcessorId});
+            updateStatus(currentProcessorId, `Cam ${currentProcessorId === '1' ? 'A' : 'B'} - System stopped`);
+        };
+
+        document.getElementById('showStreamA').onclick = () => {
+            toggleDisplayMode('streamA');
+        };
+
+        document.getElementById('showStreamB').onclick = () => {
+            toggleDisplayMode('streamB');
+        };
+
+        document.getElementById('showBothStreams').onclick = () => {
+            toggleDisplayMode('both');
+        };
+
+        ['1', '2'].forEach(pid => {
+            socket.on(`video_frame_${pid}`, (data) => {
+                const canvas = document.getElementById(`canvas${pid}`);
+                const ctx = canvas.getContext('2d');
+                const img = new Image();
+                img.src = `data:image/jpeg;base64,${data.frame}`;
+                img.onload = () => {
+                    canvas.width = frameDimensions[pid].width;
+                    canvas.height = frameDimensions[pid].height;
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                };
+            });
+
+            socket.on(`update_status_${pid}`, (data) => {
+                if (pid === currentProcessorId) {
+                    updateStatus(pid, data.message);
+                }
+            });
+
+            socket.on(`update_counts_${pid}`, (data) => {
+                processorsData[pid] = data;
+                updateDashboard();
+                renderVehicleList();
+                setupNavTabs();
+            });
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('confirmBtn').disabled = false;
+            toggleDisplayMode('both');
+            updateStatus('1', 'Cam A - Ready to start monitoring');
+            document.getElementById('canvas1').classList.add('active');
+        });
+    </script>
+</body>
+</html>
