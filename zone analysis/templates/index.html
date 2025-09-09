@@ -1,0 +1,1210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ox4Labs StockZone Pro - Advanced Storage Analysis System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #00D4FF;
+            --primary-dark: #0088CC;
+            --primary-light: #66E0FF;
+            --secondary: #40C4FF;
+            --secondary-dark: #0288D1;
+            --accent: #0288D1;
+            --accent-dark: #01579B;
+            --dark: #0A0A0A;
+            --darker: #050505;
+            --light: #FAFAFA;
+            --lighter: #FFFFFF;
+            --gray: #6B7280;
+            --gray-light: #E5E7EB;
+            --success: #00FF85;
+            --warning: #FFD700;
+            --danger: #FF3E3E;
+            --glass: rgba(255, 255, 255, 0.08);
+            --glass-border: rgba(255, 255, 255, 0.12);
+            --neon-glow: #00D4FF;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(145deg, var(--dark) 0%, var(--darker) 100%);
+            color: var(--lighter);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 50% 50%, rgba(0, 212, 255, 0.2) 0%, transparent 70%);
+            z-index: -2;
+            animation: pulseBackground 10s ease-in-out infinite;
+        }
+
+        .container {
+            max-width: 1920px;
+            margin: 0 auto;
+            padding: 2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header {
+            background: linear-gradient(135deg, rgba(20, 20, 20, 0.95) 0%, rgba(10, 10, 10, 0.98) 100%);
+            padding: 2rem;
+            border-radius: 24px;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6), 0 0 25px rgba(0, 212, 255, 0.5);
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(25px);
+            border: 1px solid var(--glass-border);
+            position: relative;
+            overflow: hidden;
+            animation: float 5s ease-in-out infinite;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(0, 212, 255, 0.35) 0%, transparent 60%);
+            animation: rotateGlow 20s linear infinite;
+            z-index: -1;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 1.2rem;
+        }
+
+        .logo {
+            width: 60px;
+            height: 60px;
+            filter: drop-shadow(0 0 15px rgba(0, 212, 255, 0.9));
+            animation: pulseLogo 3s ease-in-out infinite;
+        }
+
+        .brand {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .app-name {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--lighter);
+            background: linear-gradient(90deg, var(--primary), var(--primary-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+        }
+
+        .app-tagline {
+            font-size: 1.1rem;
+            font-weight: 400;
+            color: var(--gray-light);
+            opacity: 0.9;
+            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.4);
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 450px;
+            gap: 2rem;
+        }
+
+        .video-panel {
+            background: linear-gradient(135deg, rgba(20, 20, 20, 0.9) 0%, rgba(10, 10, 10, 0.95) 100%);
+            padding: 2rem;
+            border-radius: 28px;
+            box-shadow: 0 12px 45px rgba(0, 0, 0, 0.7), 0 0 25px rgba(0, 212, 255, 0.5);
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(25px);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .video-panel:hover {
+            transform: translateY(-5px) scale(1.01);
+            box-shadow: 0 15px 50px rgba(0, 212, 255, 0.7);
+            border-color: var(--neon-glow);
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .panel-title {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: var(--lighter);
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            text-shadow: 0 0 12px rgba(0, 212, 255, 0.9);
+        }
+
+        .panel-title i {
+            color: var(--primary-light);
+            font-size: 1.8rem;
+            text-shadow: 0 0 15px rgba(0, 212, 255, 1);
+        }
+
+        .canvas-container {
+            position: relative;
+            width: 100%;
+            height: 720px;
+            margin: 0 auto 2rem;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.7), 0 0 20px rgba(0, 212, 255, 0.5);
+            border: 2px solid rgba(0, 212, 255, 0.5);
+            transition: all 0.4s ease;
+        }
+
+        .canvas-container:hover {
+            border-color: var(--neon-glow);
+            box-shadow: 0 15px 45px rgba(0, 212, 255, 0.7);
+        }
+
+        .canvas-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(rgba(255, 255, 255, 0.02) 2px, transparent 2px),
+                        linear-gradient(90deg, rgba(255, 255, 255, 0.02) 2px, transparent 2px);
+            background-size: 50px 50px;
+            opacity: 0.5;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .canvas-overlay {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            color: var(--lighter);
+            font-size: 0.9rem;
+            font-weight: 500;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            z-index: 2;
+            text-shadow: 0 0 8px rgba(0, 212, 255, 1);
+            border: 1px solid rgba(0, 212, 255, 0.4);
+        }
+
+        .video-panel canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            border-radius: 12px;
+            background-color: var(--darker);
+            transition: all 0.4s ease;
+        }
+
+        .camera-selector {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .camera-tile {
+            position: relative;
+            height: 160px;
+            background: linear-gradient(135deg, rgba(30, 30, 30, 0.95) 0%, rgba(15, 15, 15, 0.98) 100%);
+            border-radius: 16px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.7), 0 0 20px rgba(0, 212, 255, 0.4);
+            cursor: pointer;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid var(--glass-border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .camera-tile:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 10px 30px rgba(0, 212, 255, 0.7);
+            border-color: var(--neon-glow);
+        }
+
+        .camera-tile.active {
+            border: 2px solid var(--neon-glow);
+            box-shadow: 0 10px 35px rgba(0, 212, 255, 0.9);
+            background: linear-gradient(135deg, rgba(0, 212, 255, 0.2) 0%, rgba(10, 10, 10, 0.95) 100%);
+        }
+
+        .camera-tile::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.05) 10px, transparent 10px, transparent 20px);
+            opacity: 0.4;
+            z-index: 1;
+        }
+
+        .camera-placeholder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: var(--gray-light);
+            font-size: 1rem;
+            text-align: center;
+            z-index: 2;
+        }
+
+        .camera-icon {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            color: var(--primary-light);
+            text-shadow: 0 0 12px rgba(0, 212, 255, 1);
+            animation: pulseIcon 2s ease-in-out infinite;
+        }
+
+        .camera-label {
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            text-shadow: 0 0 8px rgba(0, 212, 255, 0.7);
+        }
+
+        .camera-status {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: var(--gray);
+            box-shadow: 0 0 8px rgba(0, 0, 0, 0.6);
+            z-index: 2;
+        }
+
+        .camera-tile.active .camera-status {
+            background: var(--success);
+            box-shadow: 0 0 12px var(--success);
+            animation: blinkStatus 1.5s infinite;
+        }
+
+        .camera-meta {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 0.4rem 0.9rem;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: var(--lighter);
+            text-shadow: 0 0 8px rgba(0, 212, 255, 0.7);
+            z-index: 2;
+            border: 1px solid rgba(0, 212, 255, 0.4);
+        }
+
+        .camera-play-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.5);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: 2;
+        }
+
+        .camera-tile:hover .camera-play-overlay {
+            opacity: 1;
+        }
+
+        .camera-play-icon {
+            font-size: 2.5rem;
+            color: var(--primary-light);
+            text-shadow: 0 0 15px rgba(0, 212, 255, 1);
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .btn {
+            padding: 0.8rem 2rem;
+            border: none;
+            border-radius: 12px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6), 0 0 15px rgba(0, 212, 255, 0.5);
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 200%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+            transition: left 0.5s ease;
+            z-index: -1;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn i {
+            font-size: 1.2rem;
+            text-shadow: 0 0 10px rgba(0, 212, 255, 0.7);
+        }
+
+        .btn-pause {
+            background: linear-gradient(135deg, var(--warning) 0%, #CCAC00 100%);
+            color: var(--lighter);
+        }
+
+        .btn-pause:hover {
+            background: linear-gradient(135deg, #CCAC00 0%, #B39300 100%);
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(255, 215, 0, 0.8);
+        }
+
+        .btn-resume {
+            background: linear-gradient(135deg, var(--success) 0%, #00CC66 100%);
+            color: var(--lighter);
+        }
+
+        .btn-resume:hover {
+            background: linear-gradient(135deg, #00CC66 0%, #00B359 100%);
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(0, 255, 133, 0.8);
+        }
+
+        .btn:disabled {
+            background: var(--gray-light);
+            color: var(--gray);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+            opacity: 0.7;
+        }
+
+        .status-message {
+            margin: 1.5rem 0;
+            padding: 1rem 1.5rem;
+            background: rgba(0, 212, 255, 0.3);
+            border-radius: 12px;
+            font-size: 1rem;
+            color: var(--lighter);
+            text-align: center;
+            border-left: 6px solid var(--neon-glow);
+            backdrop-filter: blur(15px);
+            box-shadow: inset 0 0 20px rgba(0, 212, 255, 0.5);
+            text-shadow: 0 0 10px rgba(0, 212, 255, 0.7);
+        }
+
+        .status-error {
+            background: rgba(255, 62, 62, 0.3);
+            border-left: 6px solid var(--danger);
+            box-shadow: inset 0 0 20px rgba(255, 62, 62, 0.5);
+        }
+
+        .dashboard-panel {
+            background: linear-gradient(135deg, rgba(20, 20, 20, 0.95) 0%, rgba(10, 10, 10, 0.98) 100%);
+            padding: 2rem;
+            border-radius: 28px;
+            box-shadow: 0 12px 45px rgba(0, 0, 0, 0.7), 0 0 25px rgba(0, 212, 255, 0.5);
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(25px);
+            position: relative;
+            overflow: hidden;
+            height: fit-content;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .dashboard-panel::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 75% 25%, rgba(0, 212, 255, 0.35) 0%, transparent 60%);
+            z-index: -1;
+        }
+
+        .dashboard-panel:hover {
+            box-shadow: 0 15px 50px rgba(0, 212, 255, 0.7);
+            border-color: var(--neon-glow);
+            transform: translateY(-5px) scale(1.01);
+        }
+
+        .dashboard-header {
+            margin-bottom: 2rem;
+        }
+
+        .dashboard-title {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: var(--lighter);
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            text-shadow: 0 0 12px rgba(0, 212, 255, 0.9);
+        }
+
+        .dashboard-title i {
+            color: var(--neon-glow);
+            font-size: 1.8rem;
+            text-shadow: 0 0 15px rgba(0, 212, 255, 1);
+        }
+
+        .stats-container {
+            display: block;
+            gap: 1.5rem;
+        }
+
+        .zones-container {
+            margin-top: 2rem;
+        }
+
+        .zones-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: var(--lighter);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .zones-title i {
+            color: var(--neon-glow);
+            font-size: 1.4rem;
+        }
+
+        .zones-list {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1rem;
+            max-height: 500px;
+            overflow-y: auto;
+            padding-right: 0.5rem;
+        }
+
+        .zone-item {
+            background: linear-gradient(135deg, rgba(30, 30, 30, 0.95) 0%, rgba(15, 15, 15, 0.98) 100%);
+            padding: 1.5rem;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7), 0 0 20px rgba(0, 212, 255, 0.4);
+            border: 1px solid var(--glass-border);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(20px);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .zone-item:hover {
+            transform: translateY(-5px) rotateX(3deg) rotateY(3deg);
+            box-shadow: 0 12px 40px rgba(0, 212, 255, 0.7);
+            border-color: var(--neon-glow);
+        }
+
+        .zone-item.empty {
+            background: linear-gradient(135deg, rgba(0, 255, 133, 0.3) 0%, rgba(0, 204, 102, 0.3) 100%);
+        }
+
+        .zone-item.partial {
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.3) 0%, rgba(255, 165, 0, 0.3) 100%);
+        }
+
+        .zone-item.full {
+            background: linear-gradient(135deg, rgba(255, 62, 62, 0.3) 0%, rgba(204, 47, 47, 0.3) 100%);
+        }
+
+        .zone-color {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            box-shadow: 0 0 12px rgba(0, 212, 255, 0.6);
+        }
+
+        .zone-info {
+            flex-grow: 1;
+        }
+
+        .zone-name {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--lighter);
+            margin-bottom: 0.3rem;
+            text-shadow: 0 0 8px rgba(0, 212, 255, 0.7);
+        }
+
+        .zone-percent {
+            font-size: 0.9rem;
+            color: var(--gray-light);
+            text-shadow: 0 0 6px rgba(0, 212, 255, 0.5);
+        }
+
+        .analytics-list {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            padding: 1rem 0;
+        }
+
+        .analytics-item {
+            background: linear-gradient(135deg, rgba(30, 30, 30, 0.95) 0%, rgba(15, 15, 15, 0.98) 100%);
+            padding: 1.2rem;
+            border-radius: 16px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.7), 0 0 20px rgba(0, 212, 255, 0.4);
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(20px);
+            text-align: center;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .analytics-item:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 10px 30px rgba(0, 212, 255, 0.7);
+            border-color: var(--neon-glow);
+        }
+
+        .analytics-item.empty {
+            background: linear-gradient(135deg, rgba(0, 255, 133, 0.3) 0%, rgba(0, 204, 102, 0.3) 100%);
+        }
+
+        .analytics-item.partial {
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.3) 0%, rgba(255, 165, 0, 0.3) 100%);
+        }
+
+        .analytics-item.full {
+            background: linear-gradient(135deg, rgba(255, 62, 62, 0.3) 0%, rgba(204, 47, 47, 0.3) 100%);
+        }
+
+        .analytics-label {
+            font-size: 0.9rem;
+            color: var(--gray-light);
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            font-weight: 500;
+            text-shadow: 0 0 6px rgba(0, 212, 255, 0.6);
+        }
+
+        .analytics-value {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--lighter);
+            margin-top: 0.5rem;
+            text-shadow: 0 0 10px rgba(0, 212, 255, 0.8);
+        }
+
+        .analytics-item.empty .analytics-value {
+            color: var(--success);
+            text-shadow: 0 0 12px rgba(0, 255, 133, 0.9);
+        }
+
+        .analytics-item.partial .analytics-value {
+            color: var(--warning);
+            text-shadow: 0 0 12px rgba(255, 215, 0, 0.9);
+        }
+
+        .analytics-item.full .analytics-value {
+            color: var(--danger);
+            text-shadow: 0 0 12px rgba(255, 62, 62, 0.9);
+        }
+
+        .footer {
+            margin-top: 3rem;
+            padding: 2rem 0;
+            text-align: center;
+            color: var(--gray-light);
+            font-size: 1rem;
+            border-top: 1px solid var(--glass-border);
+            backdrop-filter: blur(15px);
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .footer-link {
+            color: var(--gray-light);
+            text-decoration: none;
+            transition: all 0.4s ease;
+            position: relative;
+            text-shadow: 0 0 6px rgba(0, 212, 255, 0.4);
+        }
+
+        .footer-link::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--neon-glow);
+            transition: width 0.4s ease;
+        }
+
+        .footer-link:hover {
+            color: var(--neon-glow);
+            text-shadow: 0 0 10px rgba(0, 212, 255, 0.9);
+        }
+
+        .footer-link:hover::after {
+            width: 100%;
+        }
+
+        .footer-copyright, .developer-info {
+            opacity: 0.9;
+            text-shadow: 0 0 6px rgba(0, 212, 255, 0.4);
+        }
+
+        @keyframes pulseBackground {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.5; }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        @keyframes rotateGlow {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes pulseLogo {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        @keyframes pulseIcon {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        @keyframes blinkStatus {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        ::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--neon-glow);
+            border-radius: 5px;
+            box-shadow: 0 0 15px rgba(0, 212, 255, 0.9);
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary);
+            box-shadow: 0 0 20px rgba(0, 212, 255, 1);
+        }
+
+        @media (max-width: 1400px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+
+            .dashboard-panel {
+                order: -1;
+            }
+
+            .analytics-list {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1.5rem;
+            }
+
+            .header {
+                padding: 1.5rem;
+            }
+
+            .app-name {
+                font-size: 2rem;
+            }
+
+            .canvas-container {
+                height: 500px;
+            }
+
+            .camera-selector {
+                grid-template-columns: 1fr;
+            }
+
+            .camera-tile {
+                height: 140px;
+            }
+
+            .controls {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .analytics-value {
+                font-size: 1.1rem;
+            }
+
+            .analytics-label {
+                font-size: 0.8rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .header {
+                flex-direction: column;
+                text-align: center;
+                gap: 1rem;
+            }
+
+            .app-name {
+                font-size: 1.8rem;
+            }
+
+            .app-tagline {
+                font-size: 1rem;
+            }
+
+            .canvas-container {
+                height: 400px;
+            }
+
+            .camera-tile {
+                height: 120px;
+            }
+
+            .camera-icon {
+                font-size: 2rem;
+            }
+
+            .camera-label {
+                font-size: 0.9rem;
+            }
+
+            .analytics-value {
+                font-size: 1rem;
+            }
+
+            .analytics-label {
+                font-size: 0.7rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="logo-container">
+                <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTYiIGhlaWdodD0iNTYiIHZpZXdCb3g9IjAgMCA1NiA1NiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8cmVjdCB3aWR0aD0iNTYiIGhlaWdodD0iNTYiIHJ4PSIyOCIgZmlsbD0iIzAxNTc5QiIvPgogIDxyZWN0IHg9IjEiIHk9IjEiIHdpZHRoPSI1NCIgaGVpZ2h0PSI1NCIgcng9IjI3IiBzdHJva2U9IiM0RkMzRjciIHN0cm9rZS13aWR0aD0iMiIvPgogIDxwYXRoIGQ9Ik0yMCAyM0gyNi41TDI3LjUgMjQuNUwyOCAyM0gyOS41TDMwIDI0LjVMMzAuNSAyM0gzMi41TDMzIDI0LjVMMzMuNSAyM0gzNS41TDM2IDI0LjVMMzYuNSAyM1YzMiIvPgogIDxwYXRoIGQ9Ik0yMCAyOEgyNi41TDI3LjUgMjkuNUwyOCAyOEgyOS41TDMwIDI5LjVMMzAuNSAyOEgzMi41TDMzIDI5LjVMMzMuNSAyOEgzNS41TDM2IDI5LjVMMzYuNSAyOFYzMiIgZmlsbD0iI0ZGRkZGRiIvPgogIDxwYXRoIGQ9Ik0yMyAyM0gyNS41TDI2IDI0LjVMMjYuNSAyM0gyOC41TDI5IDI0LjVMMjkuNSAyM0gzMS41TDMyIDI0LjVMMzIuNSAyM1YzMiIgZmlsbD0iIzQwQzRGRiIvPgo8L3N2Zz4=" alt="StockZone Logo" class="logo">
+                <div class="brand">
+                    <h1 class="app-name">Ox4Labs StockZone Pro</h1>
+                    <p class="app-tagline">Advanced Storage Zone Analysis System</p>
+                </div>
+            </div>
+        </header>
+
+        <div class="main-content">
+            <div class="video-panel">
+                <div class="panel-header">
+                    <h2 class="panel-title"><i class="fas fa-boxes"></i> Storage Zone Analysis</h2>
+                </div>
+                <div class="canvas-container">
+                    <canvas id="canvas1" width="1280" height="720"></canvas>
+                    <div id="canvas-overlay" class="canvas-overlay"></div>
+                </div>
+                <div class="camera-selector">
+                    <div class="camera-tile" data-camera-id="1" onclick="selectCamera('1')">
+                        <div class="camera-meta">CCTV - Storage Zone A</div>
+                        <div class="camera-status"></div>
+                        <div class="camera-placeholder">
+                            <i class="fas fa-video camera-icon"></i>
+                            <div class="camera-label">CCTV 1</div>
+                        </div>
+                        <div class="camera-play-overlay">
+                            <i class="fas fa-play camera-play-icon"></i>
+                        </div>
+                    </div>
+                    <div class="camera-tile" data-camera-id="2" onclick="selectCamera('2')">
+                        <div class="camera-meta">CCTV - Storage Zone B</div>
+                        <div class="camera-status"></div>
+                        <div class="camera-placeholder">
+                            <i class="fas fa-video camera-icon"></i>
+                            <div class="camera-label">CCTV 2</div>
+                        </div>
+                        <div class="camera-play-overlay">
+                            <i class="fas fa-play camera-play-icon"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="controls">
+                    <button onclick="togglePauseResume()" class="btn btn-pause" disabled id="pause-resume-btn">
+                        <i class="fas fa-pause"></i> Pause Detection
+                    </button>
+                </div>
+                <p id="status1" class="status-message">Status: Select a CCTV feed to start detection</p>
+            </div>
+
+            <div class="dashboard-panel">
+                <div class="dashboard-header">
+                    <h2 class="dashboard-title"><i class="fas fa-chart-pie"></i> Storage Zone Dashboard</h2>
+                </div>
+                <div class="stats-container">
+                    <h3 class="zones-title"><i class="fas fa-layer-group"></i> Zone Details</h3>
+                    <div class="zones-list" id="zones-list">
+                        <div class="zone-placeholder">No zones detected yet</div>
+                    </div>
+                </div>
+                <div class="zones-container">
+                    <h3 class="zones-title"><i class="fas fa-chart-bar"></i> Zone Analytics</h3>
+                    <div class="analytics-list" id="analytics-list">
+                        <div class="analytics-item empty">
+                            <div class="analytics-label">Empty Zones</div>
+                            <div class="analytics-value" id="empty-zones-percent">0%</div>
+                        </div>
+                        <div class="analytics-item partial">
+                            <div class="analytics-label">Partial Zones</div>
+                            <div class="analytics-value" id="partial-zones-percent">0%</div>
+                        </div>
+                        <div class="analytics-item full">
+                            <div class="analytics-label">Full Zones</div>
+                            <div class="analytics-value" id="full-zones-percent">0%</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer class="footer">
+            <div class="footer-links">
+                <a href="#" class="footer-link">Privacy Policy</a>
+                <a href="#" class="footer-link">Terms of Service</a>
+                <a href="#" class="footer-link">Documentation</a>
+                <a href="#" class="footer-link">Support</a>
+            </div>
+            <p class="footer-copyright">© 2025 Ox4Labs StockZone Pro. All rights reserved.</p>
+            <p class="developer-info">Designed & Developed by Wassim Hfaiedh</p>
+        </footer>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.1/socket.io.js"></script>
+    <script>
+        const socket = io();
+        let frameDimensions = { width: 1280, height: 720 };
+        let isProcessorReady = false;
+        let activeCameraId = null;
+        let isPaused = false;
+
+        function animateValue(element, start, end, duration) {
+            let startTimestamp = null;
+            const step = (timestamp) => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                const value = Math.floor(progress * (end - start) + start);
+                element.textContent = value + '%';
+                element.setAttribute('data-value', value);
+                if (progress < 1) {
+                    requestAnimationFrame(step);
+                }
+            };
+            requestAnimationFrame(step);
+        }
+
+        function updateDashboardStats(emptyPercent, partialPercent, fullPercent) {
+            if (isPaused) return; // Skip updates when paused
+            const elements = [
+                { id: 'empty-zones-percent', value: emptyPercent },
+                { id: 'partial-zones-percent', value: partialPercent },
+                { id: 'full-zones-percent', value: fullPercent }
+            ];
+
+            elements.forEach(({ id, value }) => {
+                const element = document.getElementById(id);
+                const currentValue = parseInt(element.getAttribute('data-value') || '0');
+                if (currentValue !== value) {
+                    animateValue(element, currentValue, value, 1000);
+                }
+            });
+        }
+
+        function updateZones(zones) {
+            if (isPaused) return; // Skip updates when paused
+            const zonesList = document.getElementById('zones-list');
+            zonesList.innerHTML = '';
+            if (!zones || Object.keys(zones).length === 0) {
+                zonesList.innerHTML = '<div class="zone-placeholder">No zones detected yet</div>';
+                updateDashboardStats(0, 0, 0);
+                return;
+            }
+
+            const sortedIds = Object.keys(zones).sort((a, b) => a - b);
+            let total = sortedIds.length;
+            let emptyCount = 0, partialCount = 0, fullCount = 0;
+            sortedIds.forEach((id) => {
+                const zoneData = zones[id];
+                if (!zoneData || !zoneData.label) {
+                    console.warn(`Invalid zone data for ID ${id}:`, zoneData);
+                    return;
+                }
+
+                if (zoneData.label === 'Empty_zone') emptyCount++;
+                else if (zoneData.label === 'Partial_zone') partialCount++;
+                else if (zoneData.label === 'Full_zone') fullCount++;
+
+                const zoneType = zoneData.label.replace('_zone', '').toLowerCase();
+                const zoneColor = zoneData.label === 'Empty_zone' ? 'var(--success)' :
+                                 zoneData.label === 'Partial_zone' ? 'var(--warning)' :
+                                 zoneData.label === 'Full_zone' ? 'var(--danger)' : '#FFFFFF';
+                const zoneItem = document.createElement('div');
+                zoneItem.className = `zone-item ${zoneType}`;
+                zoneItem.innerHTML = `
+                    <div class="zone-color" style="background-color: ${zoneColor};"></div>
+                    <div class="zone-info">
+                        <div class="zone-name">Zone ${id}</div>
+                        <div class="zone-percent">${zoneData.percent}% filled</div>
+                    </div>
+                `;
+                zonesList.appendChild(zoneItem);
+            });
+
+            const emptyPercent = total > 0 ? Math.round((emptyCount / total) * 100) : 0;
+            const partialPercent = total > 0 ? Math.round((partialCount / total) * 100) : 0;
+            const fullPercent = total > 0 ? Math.round((fullCount / total) * 100) : 0;
+            updateDashboardStats(emptyPercent, partialPercent, fullPercent);
+        }
+
+        function updateStatus(message, isError = false) {
+            const statusElement = document.getElementById('status1');
+            statusElement.textContent = `Status: ${message}`;
+            statusElement.className = isError ? 'status-message status-error' : 'status-message';
+        }
+
+        function setActiveCamera(cameraId) {
+            document.querySelectorAll('.camera-tile').forEach(tile => {
+                tile.classList.remove('active');
+                if (tile.getAttribute('data-camera-id') === cameraId) {
+                    tile.classList.add('active');
+                }
+            });
+            const overlay = document.getElementById('canvas-overlay');
+            overlay.textContent = cameraId === '1' ? 'CCTV - Storage Zone A' : cameraId === '2' ? 'CCTV - Storage Zone B' : '';
+        }
+
+        function selectCamera(cameraId) {
+            if (isPaused) return; // Prevent camera selection when paused
+            if (isProcessorReady && activeCameraId === cameraId) return;
+            console.log(`Selecting CCTV ${cameraId}`);
+            isProcessorReady = true;
+            activeCameraId = cameraId;
+            socket.emit('select_camera', { camera_id: cameraId });
+            setActiveCamera(cameraId);
+            document.getElementById('pause-resume-btn').disabled = false;
+            isPaused = false;
+            document.getElementById('pause-resume-btn').className = 'btn btn-pause';
+            document.getElementById('pause-resume-btn').innerHTML = '<i class="fas fa-pause"></i> Pause Detection';
+            canvas.style.cursor = 'default';
+        }
+
+        function togglePauseResume() {
+            if (!isProcessorReady) return;
+            isPaused = !isPaused;
+            socket.emit('toggle_pause_resume', {});
+            const button = document.getElementById('pause-resume-btn');
+            const canvas = document.getElementById('canvas1');
+            const context = canvas.getContext('2d');
+
+            if (isPaused) {
+                button.className = 'btn btn-resume';
+                button.innerHTML = '<i class="fas fa-play"></i> Resume Detection';
+                updateStatus('System fully paused');
+                // Clear canvas and show paused message
+                context.fillStyle = '#0A0A0A';
+                context.fillRect(0, 0, canvas.width, canvas.height);
+                context.fillStyle = '#FFFFFF';
+                context.font = '40px Poppins';
+                context.textAlign = 'center';
+                context.textBaseline = 'middle';
+                context.fillText('System Paused', canvas.width / 2, canvas.height / 2);
+                // Clear zones and stats
+                updateZones({});
+                updateDashboardStats(0, 0, 0);
+            } else {
+                button.className = 'btn btn-pause';
+                button.innerHTML = '<i class="fas fa-pause"></i> Pause Detection';
+                updateStatus('System fully resumed');
+                // Redraw initial message if no camera is selected
+                if (!activeCameraId) {
+                    context.fillStyle = '#0A0A0A';
+                    context.fillRect(0, 0, canvas.width, canvas.height);
+                    context.fillStyle = '#FFFFFF';
+                    context.font = '40px Poppins';
+                    context.textAlign = 'center';
+                    context.textBaseline = 'middle';
+                    context.fillText('Select a CCTV feed below', canvas.width / 2, canvas.height / 2);
+                }
+            }
+        }
+
+        socket.on('connect', () => {
+            console.log('Connected to SocketIO server');
+            updateStatus('Connected to storage analysis server');
+        });
+
+        socket.on('disconnect', () => {
+            console.log('Disconnected from SocketIO server');
+            updateStatus('Disconnected from server', true);
+            updateDashboardStats(0, 0, 0);
+            updateZones({});
+            document.querySelectorAll('.camera-tile').forEach(tile => tile.classList.remove('active'));
+            document.getElementById('canvas-overlay').textContent = '';
+            document.getElementById('pause-resume-btn').disabled = true;
+            isPaused = false;
+            isProcessorReady = false;
+            activeCameraId = null;
+            document.getElementById('pause-resume-btn').className = 'btn btn-pause';
+            document.getElementById('pause-resume-btn').innerHTML = '<i class="fas fa-pause"></i> Pause Detection';
+            const canvas = document.getElementById('canvas1');
+            const context = canvas.getContext('2d');
+            context.fillStyle = '#0A0A0A';
+            context.fillRect(0, 0, canvas.width, canvas.height);
+            context.fillStyle = '#FFFFFF';
+            context.font = '40px Poppins';
+            context.textAlign = 'center';
+            context.textBaseline = 'middle';
+            context.fillText('Select a CCTV feed below', canvas.width / 2, canvas.height / 2);
+        });
+
+        socket.on('video_frame_1', (data) => {
+            if (isPaused) return; // Ignore frames when paused
+            const img = new Image();
+            img.src = `data:image/jpeg;base64,${data.frame}`;
+            img.onload = () => {
+                context.drawImage(img, 0, 0, canvas.width, canvas.height);
+            };
+        });
+
+        socket.on('update_status_1', (data) => {
+            if (isPaused && !data.message.includes('System fully paused') && !data.message.includes('System fully resumed')) return; // Only allow pause/resume status updates when paused
+            updateStatus(data.message);
+            if (data.message.includes('Error') || data.message.includes('not found')) {
+                document.querySelectorAll('.camera-tile').forEach(tile => tile.classList.remove('active'));
+                document.getElementById('pause-resume-btn').disabled = true;
+                isProcessorReady = false;
+                activeCameraId = null;
+                isPaused = false;
+                document.getElementById('pause-resume-btn').className = 'btn btn-pause';
+                document.getElementById('pause-resume-btn').innerHTML = '<i class="fas fa-pause"></i> Pause Detection';
+                document.getElementById('canvas-overlay').textContent = '';
+                const canvas = document.getElementById('canvas1');
+                const context = canvas.getContext('2d');
+                context.fillStyle = '#0A0A0A';
+                context.fillRect(0, 0, canvas.width, canvas.height);
+                context.fillStyle = '#FFFFFF';
+                context.font = '40px Poppins';
+                context.textAlign = 'center';
+                context.textBaseline = 'middle';
+                context.fillText('Select a CCTV feed below', canvas.width / 2, canvas.height / 2);
+            }
+        });
+
+        socket.on('update_zones_1', (data) => {
+            if (isPaused) return; // Ignore zone updates when paused
+            updateZones(data.zones || {});
+        });
+
+        const canvas = document.getElementById('canvas1');
+        const context = canvas.getContext('2d');
+
+        context.fillStyle = '#0A0A0A';
+        context.fillRect(0, 0, canvas.width, canvas.height);
+        context.fillStyle = '#FFFFFF';
+        context.font = '40px Poppins';
+        context.textAlign = 'center';
+        context.textBaseline = 'middle';
+        context.fillText('Select a CCTV feed below', canvas.width / 2, canvas.height / 2);
+
+        updateDashboardStats(0, 0, 0);
+    </script>
+</body>
+</html>
