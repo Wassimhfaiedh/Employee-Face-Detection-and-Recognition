@@ -13,7 +13,7 @@ import threading
 import time
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'your-secret-key'
+app.config['SECRET_KEY'] = ''
 socketio = SocketIO(app, async_mode='threading')
 
 # Define video paths for cameras
