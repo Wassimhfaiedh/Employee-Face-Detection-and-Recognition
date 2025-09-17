@@ -1,0 +1,1526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Security Ox4labs - Integrated Surveillance</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #00D4FF;
+            --primary-dark: #0088CC;
+            --primary-light: #66E0FF;
+            --secondary: #40C4FF;
+            --secondary-dark: #0288D1;
+            --accent: #0288D1;
+            --accent-dark: #01579B;
+            --dark: #0A0A0A;
+            --darker: #050505;
+            --light: #FAFAFA;
+            --lighter: #FFFFFF;
+            --gray: #6B7280;
+            --gray-light: #E5E7EB;
+            --success: #00FF85;
+            --warning: #FFD700;
+            --danger: #FF3E3E;
+            --glass: rgba(255, 255, 255, 0.08);
+            --glass-border: rgba(255, 255, 255, 0.12);
+            --neon-glow: #00D4FF;
+            --selected-person: #FF3E3E;
+            --border-radius: 8px;
+            --shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+            --text-shadow: 0 0 8px rgba(0, 212, 255, 0.6);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Roboto Mono', monospace;
+            background: linear-gradient(145deg, var(--dark) 0%, var(--darker) 100%);
+            color: var(--lighter);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+            animation: fadeIn 1s ease-out;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 50% 50%, rgba(0, 212, 255, 0.15) 0%, transparent 70%);
+            z-index: -2;
+            animation: pulseBackground 12s ease-in-out infinite;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes pulseBackground {
+            0%, 100% { opacity: 0.2; }
+            50% { opacity: 0.4; }
+        }
+
+        .container {
+            max-width: 1920px;
+            margin: 0 auto;
+            padding: 1rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header {
+            background: linear-gradient(135deg, rgba(20, 20, 20, 0.95) 0%, rgba(10, 10, 10, 0.98) 100%);
+            padding: 1rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo {
+            width: 50px;
+            height: 50px;
+            filter: drop-shadow(0 0 12px rgba(0, 212, 255, 0.8));
+        }
+
+        .brand {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .app-name {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--lighter);
+            text-shadow: var(--text-shadow);
+        }
+
+        .app-tagline {
+            font-size: 0.9rem;
+            font-weight: 400;
+            color: var(--gray-light);
+            opacity: 0.85;
+        }
+
+        .system-status {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--success);
+            box-shadow: 0 0 10px var(--success);
+        }
+
+        .status-dot.recording {
+            background: var(--danger);
+            box-shadow: 0 0 10px var(--danger);
+            animation: blinkStatus 1.5s infinite;
+        }
+
+        @keyframes blinkStatus {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+
+        .glass-card {
+            background: linear-gradient(135deg, rgba(20, 20, 20, 0.97) 0%, rgba(10, 10, 10, 0.99) 100%);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            padding: 1rem;
+        }
+
+        .dashboard-card {
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            border-radius: var(--border-radius);
+            background: linear-gradient(135deg, rgba(30, 30, 30, 0.97) 0%, rgba(15, 15, 15, 0.99) 100%);
+            padding: 0.5rem;
+            max-width: 150px;
+            text-align: center;
+        }
+
+        .dashboard-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, var(--primary), var(--primary-light));
+        }
+
+        .dashboard-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+        }
+
+        .in-card::before, .known-card::before, .zone-card::before {
+            background: linear-gradient(90deg, var(--success), #00CC66);
+        }
+
+        .out-card::before, .visitor-card::before {
+            background: linear-gradient(90deg, var(--danger), #f87171);
+        }
+
+        .dashboard-value {
+            font-size: 1.2rem;
+            font-weight: 600;
+            line-height: 1.2;
+            color: var(--lighter);
+        }
+
+        .in-card .dashboard-value, .known-card .dashboard-value, .zone-card .dashboard-value {
+            color: var(--success);
+        }
+
+        .out-card .dashboard-value, .visitor-card .dashboard-value {
+            color: var(--danger);
+        }
+
+        .dashboard-label {
+            font-size: 0.8rem;
+            color: var(--gray-light);
+            margin-top: 0.3rem;
+        }
+
+        .record-card {
+            transition: all 0.3s ease;
+            border-left: 4px solid var(--primary);
+            border-radius: var(--border-radius);
+            background: linear-gradient(135deg, rgba(30, 30, 30, 0.97) 0%, rgba(15, 15, 15, 0.99) 100%);
+            padding: 0.5rem;
+            max-width: 300px;
+        }
+
+        .record-card.in, .record-card.known {
+            border-left-color: var(--success);
+        }
+
+        .record-card.out, .record-card.visitor {
+            border-left-color: var(--danger);
+        }
+
+        .record-card.detected {
+            border-left-color: var(--primary-light);
+        }
+
+        .record-card.empty-zone {
+            border-left-color: var(--success);
+        }
+
+        .record-card.partial-zone {
+            border-left-color: var(--warning);
+        }
+
+        .record-card.full-zone {
+            border-left-color: var(--danger);
+        }
+
+        .record-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .record-card.active {
+            border-left-width: 5px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+            transform: scale(1.01);
+        }
+
+        .record-card:active {
+            transform: scale(0.98);
+        }
+
+        .video-container {
+            position: relative;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.45);
+            background: #000;
+            width: 100%;
+            aspect-ratio: 16/9;
+        }
+
+        .control-btn {
+            transition: all 0.3s ease;
+            font-weight: 600;
+            border-radius: 4px;
+            padding: 0.5rem 1rem;
+            box-shadow: var(--shadow);
+            font-size: 0.85rem;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: var(--lighter);
+            border: none;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .camera-controls .control-btn {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.65rem;
+            gap: 0.2rem;
+        }
+
+        .control-btn:hover:not(:disabled) {
+            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--accent-dark) 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.35);
+        }
+
+        .control-btn:disabled {
+            background: var(--gray-light);
+            color: var(--gray);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+            opacity: 0.7;
+        }
+
+        .control-btn.active {
+            background: linear-gradient(135deg, var(--primary-light) 0%, var(--primary) 100%);
+            color: var(--darker);
+        }
+
+        .section-title {
+            position: relative;
+            padding-bottom: 0.75rem;
+            font-weight: 600;
+            color: var(--lighter);
+            letter-spacing: -0.025em;
+            font-size: 1.5rem;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 50px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary), var(--primary-light));
+            border-radius: 2px;
+        }
+
+        .video-thumbnail {
+            transition: all 0.3s ease;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
+        }
+
+        .video-thumbnail:hover {
+            transform: scale(1.025);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.35);
+        }
+
+        .stats-bar {
+            display: flex;
+            align-items: center;
+            background: rgba(20, 20, 20, 0.97);
+            border-radius: var(--border-radius);
+            padding: 0.8rem 1rem;
+            margin-top: 1rem;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--glass-border);
+        }
+
+        .stats-item {
+            display: flex;
+            align-items: center;
+            margin-right: 1.5rem;
+            font-size: 0.95rem;
+            color: var(--gray-light);
+            font-weight: 500;
+        }
+
+        .nav-tab {
+            padding: 0.75rem 1.25rem;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            color: var(--gray-light);
+            font-size: 0.9rem;
+        }
+
+        .nav-tab.active {
+            background: linear-gradient(135deg, rgba(30, 30, 30, 0.97) 0%, rgba(15, 15, 15, 0.99) 100%);
+            color: var(--primary);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+        }
+
+        .nav-tab:hover:not(.active) {
+            background: rgba(20, 20, 20, 0.65);
+            color: var(--lighter);
+        }
+
+        .status-bar {
+            transition: all 0.3s ease;
+            background: rgba(20, 20, 20, 0.97);
+            border: 1px solid var(--glass-border);
+            padding: 0.8rem 1rem;
+            border-radius: var(--border-radius);
+            color: var(--gray-light);
+            font-size: 0.9rem;
+            text-align: center;
+        }
+
+        .image-preview {
+            height: 50px;
+            width: auto;
+            max-width: 120px;
+            object-fit: contain;
+            background: rgba(30, 30, 30, 0.97);
+            border-radius: var(--border-radius);
+            padding: 4px;
+            border: 1px solid var(--glass-border);
+        }
+
+        .download-btn {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: var(--lighter);
+            border: none;
+            border-radius: 4px;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            font-size: 0.85rem;
+            box-shadow: var(--shadow);
+        }
+
+        .download-btn:hover {
+            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--accent-dark) 100%);
+        }
+
+        .download-btn:disabled {
+            background: var(--gray-light);
+            color: var(--gray);
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        .zone-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 10px;
+            width: 100%;
+        }
+
+        .zone-container.two-three-cameras {
+            grid-template-columns: 1fr;
+        }
+
+        .zone-container.four-cameras {
+            grid-template-columns: repeat(2, 1fr);
+            grid-template-rows: repeat(2, 1fr);
+        }
+
+        .zone-container.six-plus-cameras {
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(3, 1fr);
+        }
+
+        .zone-canvas {
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: border-color 0.3s ease;
+        }
+
+        .zone-canvas.active {
+            border-color: var(--neon-glow);
+        }
+
+        .video-container {
+            display: none;
+            max-width: 100%;
+            height: auto;
+        }
+
+        .video-container.active {
+            display: block;
+        }
+
+        .video-container.grid {
+            grid-column: span 1;
+            grid-row: span 1;
+        }
+
+        .video-container.single {
+            grid-column: span 3;
+            grid-row: span 3;
+            max-width: 100%;
+            height: auto;
+        }
+
+        .camera-controls {
+            display: none;
+            position: absolute;
+            bottom: 8px;
+            left: 8px;
+            right: 8px;
+            justify-content: space-between;
+            gap: 6px;
+        }
+
+        .video-container:hover .camera-controls {
+            display: flex;
+        }
+
+        .camera-label {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 0.4rem 0.8rem;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--lighter);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+        }
+
+        .button-section {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-top: 1rem;
+            margin-bottom: 1rem;
+            padding: 0.5rem;
+        }
+
+        .analytics-container {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .record-list-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1rem;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, rgba(20, 20, 20, 0.97) 0%, rgba(10, 10, 10, 0.99) 100%);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            width: 90%;
+            max-width: 1200px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(20px);
+            position: relative;
+            overflow: hidden;
+            animation: slideInUp 0.3s ease-out;
+        }
+
+        @keyframes slideInUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            font-size: 1.5rem;
+            color: var(--lighter);
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .modal-close:hover {
+            transform: rotate(90deg);
+            color: var(--neon-glow);
+        }
+
+        .modal-header {
+            margin-bottom: 1rem;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--lighter);
+        }
+
+        .modal-body {
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        .modal-canvas-container {
+            width: 70%;
+            height: 540px;
+            border-radius: 4px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+            border: 1px solid rgba(0, 212, 255, 0.2);
+            background: #000;
+        }
+
+        .modal-canvas-container canvas {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            background-color: #000;
+            image-rendering: pixelated;
+        }
+
+        .modal-person-card {
+            width: 30%;
+            background: linear-gradient(135deg, rgba(30, 30, 30, 0.97) 0%, rgba(15, 15, 15, 0.99) 100%);
+            padding: 1rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            border: 1px solid var(--glass-border);
+        }
+
+        .modal-person-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 4px;
+            border: 1px solid var(--glass-border);
+            margin-bottom: 1rem;
+        }
+
+        .modal-person-info {
+            font-size: 0.9rem;
+            color: var(--lighter);
+            margin-bottom: 0.8rem;
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .modal-person-info span:first-child {
+            font-weight: 600;
+            color: var(--primary-light);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.8rem;
+        }
+
+        .modal-person-info span:last-child {
+            color: var(--gray-light);
+            font-weight: 400;
+        }
+
+        .modal .download-btn {
+            margin-top: 1rem;
+        }
+
+        @media (max-width: 1400px) {
+            .zone-container {
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            }
+
+            .zone-container.two-three-cameras {
+                grid-template-columns: 1fr;
+            }
+
+            .zone-container.four-cameras {
+                grid-template-columns: repeat(2, 1fr);
+                grid-template-rows: repeat(2, 1fr);
+            }
+
+            .zone-container.six-plus-cameras {
+                grid-template-columns: repeat(2, 1fr);
+                grid-template-rows: repeat(2, 1fr);
+            }
+
+            .video-container.grid {
+                grid-column: span 1;
+                grid-row: span 1;
+            }
+
+            .video-container.single {
+                grid-column: span 2;
+                grid-row: span 2;
+                max-width: 100%;
+                height: auto;
+            }
+
+            .modal-body {
+                flex-direction: column;
+            }
+
+            .modal-canvas-container, .modal-person-card {
+                width: 100%;
+            }
+
+            .modal-canvas-container {
+                height: 400px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 0.8rem;
+            }
+
+            .header {
+                padding: 0.8rem;
+                flex-direction: column;
+                gap: 0.8rem;
+            }
+
+            .app-name {
+                font-size: 1.2rem;
+            }
+
+            .app-tagline {
+                font-size: 0.8rem;
+            }
+
+            .modal-canvas-container {
+                height: 300px;
+            }
+
+            .dashboard-card {
+                max-width: 120px;
+            }
+
+            .record-card {
+                max-width: 250px;
+            }
+
+            .record-list-container {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 0.5rem;
+            }
+
+            .header {
+                padding: 0.5rem;
+            }
+
+            .app-name {
+                font-size: 1rem;
+            }
+
+            .app-tagline {
+                font-size: 0.7rem;
+            }
+
+            .modal-canvas-container {
+                height: 240px;
+            }
+
+            .dashboard-card {
+                max-width: 100px;
+            }
+
+            .record-card {
+                max-width: 200px;
+            }
+
+            .record-list-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.6);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--neon-glow);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary);
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo-container">
+                <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTAiIGhlaWdodD0iNTAiIHZpZXdCb3g9IjAgMCA1MCA1MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjUwIiBoZWlnaHQ9IjUwIiByeD0iMjUiIGZpbGw9IiMwMTU3OUIiLz4KPHJlY3QgeD0iMSIgeT0iMSIgd2lkdGg9IjQ4IiBoZWlnaHQ9IjQ4IiByeD0iMjQiIHN0cm9rZT0iIzRGQzNGNyIgc3Ryb2tlLXdpZHRoPSIyIi8+CjxjaXJjbGUgY3g9IjI1IiBjeT0iMjUiIHI9IjEwIiBzdHJva2U9IiNGRkZGRkYiIHN0cm9rZS13aWR0aD0iMiIvPgo8Y2lyY2xlIGN4PSIyNSIgY3k9IjIwIiByPSIzIiBmaWxsPSIjRkZGRkZGIi8+CjxwYXRoIGQ9Ik0xNSAzNUMxNyAzOCAzMyAzOCAzNSAzNSIgc3Ryb2tlPSIjRkZGRkZGIiBzdHJva2Utd2lkdGg9IjIiLz4KPC9zdmc+" alt="Ox4Labs Logo" class="logo">
+                <div class="brand">
+                    <h1 class="app-name">Security Ox4labs</h1>
+                    <p class="app-tagline">AI-Powered Vehicle, Face, and Zone Analysis</p>
+                </div>
+            </div>
+            <div class="system-status">
+                <div class="status-indicator">
+                    <div class="status-dot recording"></div>
+                    <span>Recording</span>
+                </div>
+                <div class="status-indicator">
+                    <div class="status-dot"></div>
+                    <span>Online</span>
+                </div>
+                <button class="control-btn" onclick="window.location.href='/'">
+                    <i class="fas fa-cog mr-1"></i> Configure Cameras
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <div class="flex-1">
+            <!-- Video Section -->
+            <div class="glass-card p-6 mb-8">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="section-title text-2xl">Live Surveillance Feed</h2>
+                </div>
+
+                <div id="zoneContainer" class="zone-container mb-6">
+                    <!-- Video containers will be added dynamically -->
+                </div>
+
+                <div class="button-section" id="cameraButtons">
+                    <button id="showAll" class="control-btn active">
+                        <i class="fas fa-video mr-1"></i> All Streams
+                    </button>
+                    <!-- Camera-specific buttons will be added dynamically -->
+                </div>
+
+                <div id="status-container">
+                    <!-- Status bars will be added dynamically -->
+                </div>
+
+                <!-- Analytics -->
+                <div class="glass-card rounded-xl p-4 mt-6">
+                    <h2 class="section-title text-xl mb-4">Analytics</h2>
+                    <div class="analytics-container">
+                        <div class="dashboard-card in-card glass-card">
+                            <i class="fas fa-sign-in-alt text-md text-success mb-1"></i>
+                            <div class="dashboard-value" id="vehicle-in">0</div>
+                            <div class="dashboard-label">Vehicles In</div>
+                        </div>
+                        <div class="dashboard-card out-card glass-card">
+                            <i class="fas fa-sign-out-alt text-md text-danger mb-1"></i>
+                            <div class="dashboard-value" id="vehicle-out">0</div>
+                            <div class="dashboard-label">Vehicles Out</div>
+                        </div>
+                        <div class="dashboard-card known-card glass-card">
+                            <i class="fas fa-user-check text-md text-success mb-1"></i>
+                            <div class="dashboard-value" id="known-count">0</div>
+                            <div class="dashboard-label">Known Persons</div>
+                        </div>
+                        <div class="dashboard-card visitor-card glass-card">
+                            <i class="fas fa-user-times text-md text-danger mb-1"></i>
+                            <div class="dashboard-value" id="visitor-count">0</div>
+                            <div class="dashboard-label">Visitors</div>
+                        </div>
+                        <div class="dashboard-card zone-card glass-card">
+                            <i class="fas fa-map-marked-alt text-md text-success mb-1"></i>
+                            <div class="dashboard-value" id="zone-count">0</div>
+                            <div class="dashboard-label">Active Zones</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Detections -->
+            <div class="glass-card rounded-xl p-6 mb-8">
+                <h2 class="section-title text-2xl mb-6">Recent Detections</h2>
+                <div class="flex space-x-4 mb-6 border-b border-glass-border">
+                    <div class="nav-tab active" data-filter="all">All</div>
+                    <div class="nav-tab" data-filter="vehicle">Vehicles</div>
+                    <div class="nav-tab" data-filter="face">Faces</div>
+                    <div class="nav-tab" data-filter="zone">Zones</div>
+                    <div class="nav-tab" data-filter="in">Vehicles In</div>
+                    <div class="nav-tab" data-filter="out">Vehicles Out</div>
+                    <div class="nav-tab" data-filter="known">Known Persons</div>
+                    <div class="nav-tab" data-filter="visitor">Visitors</div>
+                </div>
+                <div class="grid grid-cols-1 gap-6">
+                    <!-- Vehicle Detections -->
+                    <div>
+                        <h3 class="section-title text-xl mb-4">Vehicle Detections</h3>
+                        <div class="record-list-container" id="vehicle-record-list">
+                            <!-- Vehicle records will be added here dynamically -->
+                        </div>
+                    </div>
+                    <!-- Face Detections -->
+                    <div>
+                        <h3 class="section-title text-xl mb-4">Face Detections</h3>
+                        <div class="record-list-container" id="face-record-list">
+                            <!-- Face records will be added here dynamically -->
+                        </div>
+                    </div>
+                    <!-- Zone Analysis -->
+                    <div>
+                        <h3 class="section-title text-xl mb-4">Zone Analysis</h3>
+                        <div class="record-list-container" id="zone-record-list">
+                            <!-- Zone records will be added here dynamically -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Details Modal -->
+            <div class="modal" id="details-modal">
+                <div class="modal-content">
+                    <span class="modal-close" onclick="closeModal()">&times;</span>
+                    <div class="modal-header">
+                        <h2 class="modal-title">Details</h2>
+                    </div>
+                    <div class="modal-body">
+                        <div class="modal-canvas-container">
+                            <canvas id="modal-canvas" width="1920" height="1080"></canvas>
+                        </div>
+                        <div class="modal-person-card">
+                            <img id="modal-main-img" class="modal-person-image" src="" alt="Main Image">
+                            <div class="modal-person-info"><span>ID:</span> <span id="modal-id"></span></div>
+                            <div class="modal-person-info"><span>Type:</span> <span id="modal-type"></span></div>
+                            <div class="modal-person-info"><span>Timestamp:</span> <span id="modal-time"></span></div>
+                            <div class="modal-person-info"><span>Camera:</span> <span id="modal-camera"></span></div>
+                            <div class="modal-person-info"><span>Duration:</span> <span id="modal-duration"></span></div>
+                            <div class="modal-person-info"><span>Mode:</span> <span id="modal-mode"></span></div>
+                            <div class="modal-person-info"><span>Percent:</span> <span id="modal-percent"></span></div>
+                            <div class="mt-4">
+                                <button class="download-btn" id="download-link">
+                                    <i class="fas fa-download"></i> Download Recording
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.1/socket.io.js"></script>
+    <script>
+        const socket = io();
+        let frameDimensions = {};
+        let pointsAdded = {};
+        let currentVideoUrl = '';
+        let currentEvent = null;
+        let currentProcessorId = null;
+        let displayMode = 'all';
+        let processorStates = {};
+        let processorsData = {};
+
+        // Fetch initial configuration from server
+        fetch('/get_config')
+            .then(response => response.json())
+            .then(data => {
+                initializeInterface(data.cameras);
+            })
+            .catch(error => console.error('Error fetching config:', error));
+
+        function initializeInterface(cameras) {
+            const zoneContainer = document.getElementById('zoneContainer');
+            const statusContainer = document.getElementById('status-container');
+            const cameraButtons = document.getElementById('cameraButtons');
+            zoneContainer.innerHTML = '';
+            statusContainer.innerHTML = '';
+            cameraButtons.innerHTML = '<button id="showAll" class="control-btn active"><i class="fas fa-video mr-1"></i> All Streams</button>';
+            frameDimensions = {};
+            pointsAdded = {};
+            processorStates = {};
+            processorsData = {};
+
+            cameras.forEach(camera => {
+                const processorId = camera.id;
+                const cameraName = camera.name;
+                const cameraType = camera.type;
+                const isVehicle = cameraType === 'vehicle';
+                const isZone = cameraType === 'zone';
+
+                // Initialize data structures
+                frameDimensions[processorId] = { width: 960, height: 540 };
+                pointsAdded[processorId] = 0;
+                processorStates[processorId] = { isRunning: false, isPaused: false };
+                processorsData[processorId] = isVehicle
+                    ? { in_count: 0, out_count: 0, vehicle_events: [] }
+                    : isZone
+                    ? { zones: {} }
+                    : { known_count: 0, visitor_count: 0, detections: [] };
+
+                // Create video container
+                const container = document.createElement('div');
+                container.id = `canvasContainer_${processorId}`;
+                container.className = 'video-container grid';
+                container.style.aspectRatio = '16/9';
+                container.innerHTML = `
+                    <canvas id="canvas_${processorId}" class="zone-canvas"></canvas>
+                    <div class="camera-label">${cameraName}</div>
+                    <div class="camera-controls flex">
+                        <button class="control-btn start-btn" data-processor="${processorId}">
+                            <i class="fas fa-play-circle mr-1"></i> Start
+                        </button>
+                        <button class="control-btn pause-resume-btn" data-processor="${processorId}">
+                            <i class="fas fa-pause mr-1"></i> Pause
+                        </button>
+                        ${isVehicle ? `
+                        <button class="control-btn reset-line-btn disabled" data-processor="${processorId}" disabled>
+                            <i class="fas fa-trash-alt mr-1"></i> Reset Line
+                        </button>
+                        ` : ''}
+                        <button class="control-btn clear-dashboard-btn" data-processor="${processorId}">
+                            <i class="fas fa-trash mr-1"></i> Clear Dashboard
+                        </button>
+                        <button class="control-btn maximize-btn" data-processor="${processorId}">
+                            <i class="fas fa-expand mr-1"></i> Maximize
+                        </button>
+                    </div>
+                `;
+                zoneContainer.appendChild(container);
+
+                // Create status bar
+                const statusBar = document.createElement('div');
+                statusBar.id = `status_${processorId}`;
+                statusBar.className = 'status-bar mt-4';
+                statusBar.innerHTML = `<i class="fas fa-info-circle mr-2"></i> Status: ${cameraName} - Ready to start monitoring`;
+                statusContainer.appendChild(statusBar);
+
+                // Create camera button
+                const cameraButton = document.createElement('button');
+                cameraButton.className = 'control-btn';
+                cameraButton.dataset.cameraId = processorId;
+                cameraButton.innerHTML = `<i class="fas fa-video mr-1"></i> ${cameraName}`;
+                cameraButton.addEventListener('click', () => updateDisplayMode(processorId));
+                cameraButtons.appendChild(cameraButton);
+
+                // Setup socket listeners
+                socket.on(`frame_dimensions_${processorId}`, (data) => {
+                    frameDimensions[processorId] = data;
+                    updateCanvasSize(processorId);
+                });
+                socket.on(`video_frame_${processorId}`, (data) => {
+                    updateFrame(processorId, data.frame);
+                });
+                socket.on(`update_status_${processorId}`, (data) => {
+                    updateStatus(processorId, data.message);
+                });
+                if (isVehicle) {
+                    socket.on(`update_vehicle_counts_${processorId}`, (data) => {
+                        updateVehicleCounts(processorId, data);
+                    });
+                } else if (isZone) {
+                    socket.on(`update_zones_${processorId}`, (data) => {
+                        updateZoneData(processorId, data);
+                    });
+                } else {
+                    socket.on(`update_face_analytics_${processorId}`, (data) => {
+                        updateFaceAnalytics(processorId, data);
+                    });
+                    socket.on(`update_face_detections_${processorId}`, (data) => {
+                        updateFaceDetections(processorId, data);
+                    });
+                }
+            });
+
+            // Setup event listeners
+            setupEventListeners();
+            updateDisplayMode('all');
+        }
+
+        function setupEventListeners() {
+            document.querySelectorAll('.start-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const processorId = btn.dataset.processor;
+                    if (!processorStates[processorId].isRunning) {
+                        socket.emit('start', { processor_id: processorId });
+                        btn.innerHTML = `<i class="fas fa-stop-circle mr-1"></i> Stop`;
+                    } else {
+                        socket.emit('stop', { processor_id: processorId });
+                    }
+                });
+            });
+
+            document.querySelectorAll('.pause-resume-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const processorId = btn.dataset.processor;
+                    socket.emit('toggle_pause_resume', { processor_id: processorId });
+                });
+            });
+
+            document.querySelectorAll('.reset-line-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const processorId = btn.dataset.processor;
+                    socket.emit('delete_line', { processor_id: processorId });
+                    pointsAdded[processorId] = 0;
+                    btn.disabled = true;
+                });
+            });
+
+            document.querySelectorAll('.clear-dashboard-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const processorId = btn.dataset.processor;
+                    socket.emit('clear_dashboard', { processor_id: processorId });
+                });
+            });
+
+            document.querySelectorAll('.maximize-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const processorId = btn.dataset.processor;
+                    if (displayMode === 'all') {
+                        updateDisplayMode(processorId);
+                    } else {
+                        updateDisplayMode('all');
+                    }
+                });
+            });
+
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    updateVehicleRecords();
+                    updateFaceRecords();
+                    updateZoneRecords();
+                });
+            });
+
+            document.getElementById('showAll').addEventListener('click', () => updateDisplayMode('all'));
+
+            document.getElementById('download-link').addEventListener('click', () => {
+                if (currentVideoUrl) {
+                    const a = document.createElement('a');
+                    a.href = currentVideoUrl;
+                    a.download = currentVideoUrl.split('/').pop();
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                }
+            });
+
+            Object.keys(frameDimensions).forEach(processorId => {
+                const canvas = document.getElementById(`canvas_${processorId}`);
+                if (processorId.includes('vehicle')) {
+                    canvas.addEventListener('click', (e) => {
+                        const rect = canvas.getBoundingClientRect();
+                        const scaleX = frameDimensions[processorId].width / rect.width;
+                        const scaleY = frameDimensions[processorId].height / rect.height;
+                        const x = (e.clientX - rect.left) * scaleX;
+                        const y = (e.clientY - rect.top) * scaleY;
+                        if (pointsAdded[processorId] < 2) {
+                            socket.emit('add_line_point', { processor_id: processorId, x, y });
+                            pointsAdded[processorId]++;
+                            if (pointsAdded[processorId] === 2) {
+                                socket.emit('complete_line', { processor_id: processorId });
+                                document.querySelector(`.reset-line-btn[data-processor="${processorId}"]`).disabled = false;
+                            }
+                        }
+                    });
+                }
+            });
+        }
+
+        function updateStatus(processorId, message) {
+            const statusElement = document.getElementById(`status_${processorId}`);
+            statusElement.innerHTML = `<i class="fas fa-info-circle mr-2"></i> Status: ${message}`;
+            statusElement.classList.toggle('hidden', displayMode !== 'all' && displayMode !== processorId);
+            if (message.includes('started')) {
+                processorStates[processorId].isRunning = true;
+                processorStates[processorId].isPaused = false;
+                const pauseBtn = document.querySelector(`.pause-resume-btn[data-processor="${processorId}"]`);
+                pauseBtn.innerHTML = `<i class="fas fa-pause mr-1"></i> Pause`;
+            } else if (message.includes('paused')) {
+                processorStates[processorId].isPaused = true;
+                const pauseBtn = document.querySelector(`.pause-resume-btn[data-processor="${processorId}"]`);
+                pauseBtn.innerHTML = `<i class="fas fa-play mr-1"></i> Resume`;
+            } else if (message.includes('resumed')) {
+                processorStates[processorId].isPaused = false;
+                const pauseBtn = document.querySelector(`.pause-resume-btn[data-processor="${processorId}"]`);
+                pauseBtn.innerHTML = `<i class="fas fa-pause mr-1"></i> Pause`;
+            } else if (message.includes('stopped')) {
+                processorStates[processorId].isRunning = false;
+                processorStates[processorId].isPaused = false;
+                const startBtn = document.querySelector(`.start-btn[data-processor="${processorId}"]`);
+                startBtn.innerHTML = `<i class="fas fa-play-circle mr-1"></i> Start`;
+                const pauseBtn = document.querySelector(`.pause-resume-btn[data-processor="${processorId}"]`);
+                pauseBtn.innerHTML = `<i class="fas fa-pause mr-1"></i> Pause`;
+            }
+        }
+
+        function updateCanvasSize(processorId) {
+            const canvas = document.getElementById(`canvas_${processorId}`);
+            const container = document.getElementById(`canvasContainer_${processorId}`);
+            const dimensions = frameDimensions[processorId] || {width: 960, height: 540};
+            canvas.width = dimensions.width;
+            canvas.height = dimensions.height;
+            canvas.style.width = '100%';
+            canvas.style.height = '100%';
+        }
+
+        function updateFrame(processorId, frameData) {
+            const canvas = document.getElementById(`canvas_${processorId}`);
+            const ctx = canvas.getContext('2d');
+            const img = new Image();
+            img.onload = () => {
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                if (currentProcessorId === processorId && currentEvent) {
+                    const modalCanvas = document.getElementById('modal-canvas');
+                    const modalCtx = modalCanvas.getContext('2d');
+                    modalCtx.drawImage(img, 0, 0, modalCanvas.width, modalCanvas.height);
+                }
+            };
+            img.src = `data:image/jpeg;base64,${frameData}`;
+        }
+
+        function updateVehicleCounts(processorId, data) {
+            processorsData[processorId].in_count = data.in_count;
+            processorsData[processorId].out_count = data.out_count;
+            processorsData[processorId].vehicle_events = data.vehicle_events;
+            updateAnalytics();
+            updateVehicleRecords();
+        }
+
+        function updateFaceAnalytics(processorId, data) {
+            processorsData[processorId].known_count = data.known_count;
+            processorsData[processorId].visitor_count = data.visitor_count;
+            updateAnalytics();
+        }
+
+        function updateFaceDetections(processorId, data) {
+            processorsData[processorId].detections = data.detections;
+            updateFaceRecords();
+        }
+
+        function updateZoneData(processorId, data) {
+            processorsData[processorId].zones = data.zones;
+            updateAnalytics();
+            updateZoneRecords();
+        }
+
+        function updateAnalytics() {
+            const totalIn = Object.values(processorsData).reduce((sum, data) => sum + (data.in_count || 0), 0);
+            const totalOut = Object.values(processorsData).reduce((sum, data) => sum + (data.out_count || 0), 0);
+            const totalKnown = Object.values(processorsData).reduce((sum, data) => sum + (data.known_count || 0), 0);
+            const totalVisitor = Object.values(processorsData).reduce((sum, data) => sum + (data.visitor_count || 0), 0);
+            const totalZones = Object.values(processorsData).reduce((sum, data) => sum + (data.zones ? Object.keys(data.zones).length : 0), 0);
+            document.getElementById('vehicle-in').textContent = totalIn;
+            document.getElementById('vehicle-out').textContent = totalOut;
+            document.getElementById('known-count').textContent = totalKnown;
+            document.getElementById('visitor-count').textContent = totalVisitor;
+            document.getElementById('zone-count').textContent = totalZones;
+        }
+
+        function updateVehicleRecords() {
+            const vehicleList = document.getElementById('vehicle-record-list');
+            vehicleList.innerHTML = '';
+            const filter = document.querySelector('.nav-tab.active').dataset.filter;
+            const allEvents = Object.keys(processorsData)
+                .filter(id => processorsData[id].vehicle_events)
+                .flatMap(id => processorsData[id].vehicle_events.map(e => ({...e, processorId: id})))
+                .sort((a, b) => new Date(b.cross_time) - new Date(a.cross_time));
+            allEvents.forEach(event => {
+                if (filter === 'all' || filter === 'vehicle' || (filter === 'in' && event.mode === 'In') || (filter === 'out' && event.mode === 'Out')) {
+                    const record = document.createElement('div');
+                    record.className = `record-card ${event.mode.toLowerCase()} p-4 cursor-pointer`;
+                    record.dataset.processor = event.processorId;
+                    record.dataset.eventId = event.id;
+                    record.innerHTML = `
+                        <div class="flex items-center gap-3">
+                            <img src="data:image/jpeg;base64,${event.plate_img}" class="image-preview" alt="Vehicle">
+                            <div>
+                                <div class="font-semibold text-lighter text-sm">${event.matricule}</div>
+                                <div class="text-xs text-gray-light">${event.cross_time}</div>
+                                <div class="text-xs text-gray-light">Camera: ${event.camera}</div>
+                                <div class="text-xs text-gray-light">Mode: ${event.mode}</div>
+                            </div>
+                        </div>
+                    `;
+                    record.addEventListener('click', () => showDetails(event, event.processorId, 'vehicle'));
+                    vehicleList.appendChild(record);
+                }
+            });
+        }
+
+        function updateFaceRecords() {
+            const faceList = document.getElementById('face-record-list');
+            faceList.innerHTML = '';
+            const filter = document.querySelector('.nav-tab.active').dataset.filter;
+            const allDetections = Object.keys(processorsData)
+                .filter(id => processorsData[id].detections)
+                .flatMap(id => processorsData[id].detections.map(d => ({...d, processorId: id})))
+                .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+            allDetections.forEach(detection => {
+                if (filter === 'all' || filter === 'face' || (filter === 'known' && detection.name !== 'Visitor') || (filter === 'visitor' && detection.name === 'Visitor')) {
+                    const record = document.createElement('div');
+                    record.className = `record-card ${detection.name === 'Visitor' ? 'visitor' : 'known'} p-4 cursor-pointer`;
+                    record.dataset.processor = detection.processorId;
+                    record.dataset.faceId = detection.face_id;
+                    record.innerHTML = `
+                        <div class="flex items-center gap-3">
+                            <img src="data:image/jpeg;base64,${detection.face_image}" class="image-preview" alt="Person">
+                            <div>
+                                <div class="font-semibold text-lighter text-sm">${detection.name}</div>
+                                <div class="text-xs text-gray-light">${detection.timestamp}</div>
+                                <div class="text-xs text-gray-light">Camera: ${detection.camera}</div>
+                                <div class="text-xs text-gray-light">Type: ${detection.name === 'Visitor' ? 'Visitor' : 'Known'}</div>
+                            </div>
+                        </div>
+                    `;
+                    record.addEventListener('click', () => showDetails(detection, detection.processorId, 'face'));
+                    faceList.appendChild(record);
+                }
+            });
+        }
+
+        function updateZoneRecords() {
+            const zoneList = document.getElementById('zone-record-list');
+            zoneList.innerHTML = '';
+            const filter = document.querySelector('.nav-tab.active').dataset.filter;
+            const allZones = Object.keys(processorsData)
+                .filter(id => processorsData[id].zones)
+                .flatMap(id => Object.entries(processorsData[id].zones).map(([zoneId, zone]) => ({
+                    id: zoneId,
+                    label: zone.label,
+                    percent: zone.percent,
+                    camera_name: zone.camera,
+                    processorId: id
+                })));
+            allZones.forEach(zone => {
+                if (filter === 'all' || filter === 'zone') {
+                    const zoneClass = zone.label.toLowerCase().replace('_', '-');
+                    const record = document.createElement('div');
+                    record.className = `record-card ${zoneClass} p-4`;
+                    record.dataset.processor = zone.processorId;
+                    record.dataset.zoneId = zone.id;
+                    record.innerHTML = `
+                        <div class="flex items-center gap-3">
+                            <div>
+                                <div class="font-semibold text-lighter text-sm">Zone ${zone.id}</div>
+                                <div class="text-xs text-gray-light">Label: ${zone.label}</div>
+                                <div class="text-xs text-gray-light">Percent: ${zone.percent}%</div>
+                                <div class="text-xs text-gray-light">Camera: ${zone.camera_name}</div>
+                            </div>
+                        </div>
+                    `;
+                    zoneList.appendChild(record);
+                }
+            });
+        }
+
+        async function showDetails(event, processorId, type) {
+            currentEvent = event;
+            currentProcessorId = processorId;
+            const modal = document.getElementById('details-modal');
+            document.getElementById('modal-id').textContent = event.matricule || event.name || `Zone ${event.id}`;
+            document.getElementById('modal-type').textContent = type.charAt(0).toUpperCase() + type.slice(1);
+            document.getElementById('modal-time').textContent = event.cross_time || event.timestamp || 'N/A';
+            document.getElementById('modal-camera').textContent = event.camera || event.camera_name || 'Unknown';
+            document.getElementById('modal-duration').textContent = event.video_duration || 'N/A';
+            document.getElementById('modal-mode').textContent = event.mode || (event.name === 'Visitor' ? 'Visitor' : 'Known') || event.label || 'Zone';
+            document.getElementById('modal-percent').textContent = type === 'zone' ? `${event.percent}%` : 'N/A';
+            document.getElementById('modal-main-img').src = type === 'zone' ? '' : `data:image/jpeg;base64,${event.plate_img || event.face_image}`;
+            currentVideoUrl = event.video_path ? `/videos/${event.video_path}` : '';
+            document.getElementById('download-link').disabled = !currentVideoUrl;
+
+            const canvas = document.getElementById('modal-canvas');
+            const ctx = canvas.getContext('2d');
+            const img = new Image();
+            img.src = type === 'zone' ? '' : `data:image/jpeg;base64,${event.plate_img || event.face_image}`;
+            img.onload = () => {
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            };
+
+            if (type === 'vehicle') {
+                const response = await fetch(`/get_vehicle_details/${processorId}/${event.id}`);
+                const details = await response.json();
+                if (!details.error) {
+                    document.getElementById('modal-main-img').src = `data:image/jpeg;base64,${details.car_img}`;
+                    document.getElementById('modal-duration').textContent = details.video_duration;
+                    currentVideoUrl = details.video_path ? `/videos/${details.video_path}` : '';
+                    socket.emit('request_frame', { processor_id: processorId, event_id: event.id });
+                }
+            } else if (type === 'face') {
+                socket.emit('request_frame', { processor_id: processorId, face_id: event.face_id });
+            } else if (type === 'zone') {
+                socket.emit('request_frame', { processor_id: processorId, zone_id: event.id });
+            }
+
+            modal.style.display = 'flex';
+            document.querySelectorAll('.record-card').forEach(r => r.classList.remove('active'));
+            const selectedRecord = document.querySelector(`.record-card[data-processor="${processorId}"][data-${type}-id="${event.id || event.face_id || event.zone_id}"]`);
+            if (selectedRecord) selectedRecord.classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('details-modal').style.display = 'none';
+            if (currentProcessorId) {
+                socket.emit('reset_selected', { processor_id: currentProcessorId });
+            }
+            currentEvent = null;
+            currentProcessorId = null;
+            currentVideoUrl = '';
+            document.querySelectorAll('.record-card').forEach(r => r.classList.remove('active'));
+            const modalCanvas = document.getElementById('modal-canvas');
+            const modalCtx = modalCanvas.getContext('2d');
+            modalCtx.fillStyle = '#000';
+            modalCtx.fillRect(0, 0, modalCanvas.width, modalCanvas.height);
+        }
+
+        function updateDisplayMode(mode) {
+            displayMode = mode;
+            const zoneContainer = document.getElementById('zoneContainer');
+            const containers = document.querySelectorAll('.video-container');
+            const statusBars = document.querySelectorAll('.status-bar');
+            const maximizeBtns = document.querySelectorAll('.maximize-btn');
+            const showAllBtn = document.getElementById('showAll');
+            const cameraButtons = document.querySelectorAll('#cameraButtons .control-btn');
+            const cameraCount = Object.keys(frameDimensions).length;
+
+            cameraButtons.forEach(btn => btn.classList.remove('active'));
+            if (mode === 'all') {
+                showAllBtn.classList.add('active');
+            } else {
+                const activeBtn = document.querySelector(`#cameraButtons .control-btn[data-camera-id="${mode}"]`);
+                if (activeBtn) activeBtn.classList.add('active');
+            }
+
+            containers.forEach(container => {
+                container.classList.remove('active', 'single', 'grid');
+                container.style.maxWidth = '';
+                container.style.height = '';
+            });
+            statusBars.forEach(bar => bar.classList.add('hidden'));
+
+            zoneContainer.classList.remove('grid-cols-1', 'two-three-cameras', 'four-cameras', 'six-plus-cameras');
+            if (mode === 'all') {
+                if (cameraCount <= 3) {
+                    zoneContainer.classList.add('two-three-cameras');
+                } else if (cameraCount === 4) {
+                    zoneContainer.classList.add('four-cameras');
+                } else {
+                    zoneContainer.classList.add('six-plus-cameras');
+                }
+                containers.forEach(container => {
+                    container.classList.add('active', 'grid');
+                    container.style.maxWidth = '100%';
+                    container.style.height = 'auto';
+                    document.getElementById(`status_${container.id.replace('canvasContainer_', '')}`).classList.remove('hidden');
+                });
+                maximizeBtns.forEach(btn => {
+                    btn.innerHTML = '<i class="fas fa-expand mr-1"></i> Maximize';
+                });
+            } else {
+                zoneContainer.classList.add('grid-cols-1');
+                const container = document.getElementById(`canvasContainer_${mode}`);
+                container.classList.add('active', 'single');
+                container.style.maxWidth = '100%';
+                container.style.height = 'auto';
+                document.getElementById(`status_${mode}`).classList.remove('hidden');
+                const activeBtn = document.querySelector(`.maximize-btn[data-processor="${mode}"]`);
+                if (activeBtn) {
+                    activeBtn.innerHTML = '<i class="fas fa-compress mr-1"></i> Return to Grid';
+                }
+                maximizeBtns.forEach(btn => {
+                    if (btn.dataset.processor !== mode) {
+                        btn.innerHTML = '<i class="fas fa-expand mr-1"></i> Maximize';
+                    }
+                });
+            }
+            Object.keys(frameDimensions).forEach(processorId => updateCanvasSize(processorId));
+        }
+
+        socket.on('connect', () => {
+            console.log('Connected to SocketIO server');
+            document.querySelectorAll('.status-bar').forEach(bar => {
+                bar.innerHTML = `<i class="fas fa-info-circle mr-2"></i> Status: Connected to server`;
+            });
+            document.querySelector('.status-indicator .status-dot:not(.recording)').style.background = 'var(--success)';
+            document.querySelector('.status-indicator .status-dot:not(.recording)').style.boxShadow = '0 0 10px var(--success)';
+        });
+
+        socket.on('disconnect', () => {
+            console.log('Disconnected from SocketIO server');
+            document.querySelectorAll('.status-bar').forEach(bar => {
+                bar.innerHTML = `<i class="fas fa-info-circle mr-2"></i> Status: Disconnected from server`;
+            });
+            document.querySelector('.status-indicator .status-dot:not(.recording)').style.background = 'var(--gray)';
+            document.querySelector('.status-indicator .status-dot:not(.recording)').style.boxShadow = '0 0 8px rgba(0, 0, 0, 0.5)';
+        });
+
+        socket.on('frame', (data) => {
+            if (currentProcessorId && currentEvent) {
+                const modalCanvas = document.getElementById('modal-canvas');
+                const modalCtx = modalCanvas.getContext('2d');
+                const img = new Image();
+                img.onload = () => {
+                    modalCtx.drawImage(img, 0, 0, modalCanvas.width, modalCanvas.height);
+                };
+                img.src = `data:image/jpeg;base64,${data.frame}`;
+            }
+        });
+
+        window.addEventListener('resize', () => {
+            Object.keys(frameDimensions).forEach(processorId => updateCanvasSize(processorId));
+        });
+    </script>
+</body>
+</html>
